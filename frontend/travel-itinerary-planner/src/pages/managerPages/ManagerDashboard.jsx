@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Users, Calendar, Hotel, DollarSign } from 'lucide-react'
-import { Sidebar } from '../../components/ManagerSidebar'
-import { Navbar } from '../../components/ManagerNavbar'
+import { Sidebar } from '../../components/Manager/ManagerSidebar'
+import { Navbar } from '../../components/Manager/ManagerNavbar'
 
 export default function ManagerDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)

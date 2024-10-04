@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import Swal from 'sweetalert2';
+import AdminSidebar from '../../components/Admin/Sidebar';
+import { FiUser, FiLock, FiUnlock, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -17,6 +20,8 @@ const UserList = () => {
                 setUsers(response.data);
             } catch (err) {
                 setError(err.response?.data || 'Failed to fetch users');
+            } finally {
+                setLoading(false);
             }
         };
         fetchUsers();
@@ -28,8 +33,8 @@ const UserList = () => {
             text: 'You are about to block this user!',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#6B7280',
             confirmButtonText: 'Yes, block it!',
         });
 
@@ -41,17 +46,19 @@ const UserList = () => {
                     },
                 });
                 setUsers(users.map(user => user._id === id ? { ...user, isBlocked: true } : user));
-                Swal.fire(
-                    'Blocked!',
-                    'The user has been blocked.',
-                    'success'
-                );
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Blocked!',
+                    text: 'The user has been blocked.',
+                    confirmButtonColor: '#10B981',
+                });
             } catch (err) {
-                Swal.fire(
-                    'Error!',
-                    err.response?.data || 'Failed to block user',
-                    'error'
-                );
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: err.response?.data || 'Failed to block user',
+                    confirmButtonColor: '#EF4444',
+                });
             }
         }
     };
@@ -62,8 +69,8 @@ const UserList = () => {
             text: 'You are about to unblock this user!',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#10B981',
+            cancelButtonColor: '#6B7280',
             confirmButtonText: 'Yes, unblock it!',
         });
 
@@ -75,55 +82,92 @@ const UserList = () => {
                     },
                 });
                 setUsers(users.map(user => user._id === id ? { ...user, isBlocked: false } : user));
-                Swal.fire(
-                    'Unblocked!',
-                    'The user has been unblocked.',
-                    'success'
-                );
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Unblocked!',
+                    text: 'The user has been unblocked.',
+                    confirmButtonColor: '#10B981',
+                });
             } catch (err) {
-                Swal.fire(
-                    'Error!',
-                    err.response?.data || 'Failed to unblock user',
-                    'error'
-                );
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: err.response?.data || 'Failed to unblock user',
+                    confirmButtonColor: '#EF4444',
+                });
             }
         }
     };
 
     return (
-        <div className="user-list-container bg-white shadow-md rounded-lg p-6 max-w-3xl mx-auto mt-10">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">User List</h2>
-            {error && <p className="text-red-500 mb-4">{error}</p>}
-            <ul className="space-y-4">
-                {users.map(user => (
-                    <li 
-                        key={user._id} 
-                        className="flex justify-between items-center p-4 bg-gray-100 rounded-md shadow-sm hover:bg-gray-200 transition">
-                        <div>
-                            <p className="text-lg font-medium text-gray-700">{user.name} ({user.email})</p>
-                            <p className={`text-sm ${user.isBlocked ? 'text-red-500' : 'text-green-500'}`}>
-                                {user.isBlocked ? 'Blocked' : 'Active'}
-                            </p>
-                        </div>
-                        <div className="flex space-x-2">
-                            <button 
-                                onClick={() => handleBlockUser(user._id)} 
-                                disabled={user.isBlocked}
-                                className={`px-4 py-2 rounded-md text-sm font-medium ${user.isBlocked ? 'bg-gray-400 text-gray-800' : 'bg-red-500 text-white hover:bg-red-600 transition'}`}
-                            >
-                                Block
-                            </button>
-                            <button 
-                                onClick={() => handleUnblockUser(user._id)} 
-                                disabled={!user.isBlocked}
-                                className={`px-4 py-2 rounded-md text-sm font-medium ${!user.isBlocked ? 'bg-gray-400 text-gray-800' : 'bg-green-500 text-white hover:bg-green-600 transition'}`}
-                            >
-                                Unblock
-                            </button>
-                        </div>
-                    </li>
-                ))}
-            </ul>
+        <div className="flex h-screen bg-gray-100">
+            <div className="w-64">
+                <AdminSidebar />
+            </div>
+            <div className="flex-grow p-8">
+                <h1 className="text-3xl font-bold text-gray-800 mb-6">User Management</h1>
+                {loading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+                    </div>
+                ) : error ? (
+                    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                        <p className="font-bold">Error</p>
+                        <p>{error}</p>
+                    </div>
+                ) : (
+                    <div className="bg-white shadow-md rounded-lg overflow-hidden">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {users.map(user => (
+                                    <tr key={user._id} className="hover:bg-gray-50">
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center">
+                                                <div className="flex-shrink-0 h-10 w-10">
+                                                    <FiUser className="h-10 w-10 rounded-full text-gray-400" />
+                                                </div>
+                                                <div className="ml-4">
+                                                    <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                                                    <div className="text-sm text-gray-500">{user.email}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isBlocked ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                                                {user.isBlocked ? 'Blocked' : 'Active'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            {user.isBlocked ? (
+                                                <button
+                                                    onClick={() => handleUnblockUser(user._id)}
+                                                    className="text-green-600 hover:text-green-900 transition duration-150 ease-in-out mr-2"
+                                                >
+                                                    <FiUnlock className="inline-block mr-1" /> Unblock
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleBlockUser(user._id)}
+                                                    className="text-red-600 hover:text-red-900 transition duration-150 ease-in-out mr-2"
+                                                >
+                                                    <FiLock className="inline-block mr-1" /> Block
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

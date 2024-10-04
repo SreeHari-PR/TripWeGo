@@ -1,6 +1,6 @@
 require('dotenv').config();
 const bcrypt = require('bcrypt');
-const { findManagerById, findManagerByEmail, createManager } = require('../repositories/managerRepository');
+const { findManagerById, findManagerByEmail, createManager,updateManager } = require('../repositories/managerRepository');
 const {  validateManager } = require('../models/managerModel');
 const sendEmail = require('../utils/sendEmail');
 const generateOtp = require('../utils/generateOtp');
@@ -86,6 +86,8 @@ class ManagerService {
         }
 
         const token = manager.generateAuthToken();
+        console.log(token,'token');
+        
         return { manager, token };
     }
 
@@ -125,6 +127,17 @@ class ManagerService {
 
         return manager;
     }
+    async editManagerProfile(managerId, updateData) {
+        const manager = await findManagerById(managerId);
+        console.log(manager,'gjhgjg');
+        
+        
+        if (!manager) {
+          throw new Error('Manager not found');
+        }
+        const updatedManager = await updateManager(managerId, updateData);
+        return updatedManager;
+      }
 }
 
 module.exports = ManagerService;

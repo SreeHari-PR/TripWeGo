@@ -16,9 +16,9 @@ class ManagerRepository {
         return await Manager.findOne({ email });
     }
 
-    async updateManager(id, updateData) {
-        return await Manager.findByIdAndUpdate(id, updateData, { new: true });
-    }
+    async updateManager(managerId, updateData) {
+        return await Manager.findByIdAndUpdate(managerId, updateData, { new: true });
+      }
 
     async deleteManager(id) {
         return await Manager.findByIdAndDelete(id);
@@ -27,6 +27,16 @@ class ManagerRepository {
     async getAllManagers() {
         return await Manager.find({});
     }
+    async updateProfilePicture(managerId, imageUrl) {
+        try {
+          const updatedManager = await Manager.findByIdAndUpdate(managerId, {
+            profilePicture: imageUrl,
+          }, { new: true });
+          return updatedManager;
+        } catch (error) {
+          throw new Error('Error updating profile picture');
+        }
+      }
 }
 
 module.exports = new ManagerRepository();

@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
-import UserList from '../adminPages/userList';
-import ListManagers from './ManagerList';
-import Sidebar from '../../components/Sidebar';
+import AdminSidebar from '../../components/Admin/Sidebar';
+
 
 const AdminDashboard = () => {
-  const [activePage, setActivePage] = useState('dashboard');
 
-  const handlePageChange = (page) => {
-    setActivePage(page);
-  };
 
   return (
-    <div className="dashboard-container">
-      <Sidebar handlePageChange={handlePageChange} activePage={activePage} />
-      {activePage === 'users' && <UserList />}
-      {activePage === 'managers' && <ListManagers />}
+    <div className="flex h-screen bg-gray-100">
+    <div className="w-64">
+      <AdminSidebar />
+    </div>
+    <div className="flex-grow w-auto mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-[#002233] mb-6">dashboard</h1>
+    </div>
     </div>
   );
 };

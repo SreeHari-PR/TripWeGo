@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaEye, FaSearch, FaPlus, FaTimes } from 'react-icons/fa';
 import api from '../../services/api';
-import AdminSidebar from '../../components/Sidebar';
+import AdminSidebar from '../../components/Admin/Sidebar';
 
 export default function AdminManagerList() {
   const [managers, setManagers] = useState([]);
@@ -13,7 +13,14 @@ export default function AdminManagerList() {
   useEffect(() => {
     const fetchManagers = async () => {
       try {
-        const response = await api.get('/admin/managers');
+        const token = localStorage.getItem('token'); 
+        console.log(token,'token');
+        
+        const response = await api.get('/admin/managers', {
+          headers: {
+            Authorization: `Bearer ${token}` 
+          }
+        });
         setManagers(response.data);
       } catch (error) {
         console.error('Error fetching managers:', error);
@@ -77,7 +84,7 @@ export default function AdminManagerList() {
       <div className="w-64">
         <AdminSidebar />
       </div>
-      <div className="flex-grow container mx-auto px-4 py-8">
+      <div className="flex-grow w-auto mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-[#002233] mb-6">Manager List</h1>
         <div className="mb-4 flex justify-between items-center">
           <div className="relative">

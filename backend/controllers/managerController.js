@@ -1,10 +1,9 @@
 const ManagerService = require('../services/managerService');
+const managerRepository=require('../repositories/managerRepository')
 const managerService = new ManagerService();
 
 class ManagerController {
     async registerManager(req, res) {
-        console.log(req.body,'jsjksj');
-        
         try {
           if (!req.body.license || !req.body.kyc) {
             throw new Error('License and KYC documents are required');
@@ -62,7 +61,7 @@ class ManagerController {
     }
 
     async getManagerProfile(req, res) {
-        const managerId = req.manager._id;
+        const { managerId } = req.query;
         console.log(managerId)
         try {
             const manager = await managerService.getManagerProfile(managerId);
@@ -91,6 +90,46 @@ class ManagerController {
             res.status(400).send({ error: error.message });
         }
     }
+    async editManagerProfile(req, res)  {
+        console.log('gdfsfssd');
+        
+        try {
+            const managerId = req.query  
+          const updateData = req.body;  
+          console.log(managerId,'manager');
+          
+      
+          const updatedManager = await managerService.editManagerProfile(managerId, updateData);
+      
+          res.status(200).json({
+            success: true,
+            message: 'Manager profile updated successfully',
+            data: updatedManager
+          });
+        } catch (error) {
+          res.status(400).json({
+            success: false,
+            message: error.message || 'Something went wrong',
+          });
+        }}
+      async  updateProfileImage  (req, res)  {
+            try {
+              const { imageUrl } = req.body;
+              const { managerId } = req.body; 
+              console.log(req.body,'hskjdfjkh');
+              
+
+              const updatedManager = await managerRepository.updateProfilePicture(managerId, imageUrl);
+          
+              if (updatedManager) {
+                res.status(200).json({ success: true, message: 'Profile image updated', data: updatedManager });
+              } else {
+                res.status(404).json({ success: false, message: 'Manager not found' });
+              }
+            } catch (error) {
+              res.status(500).json({ success: false, message: 'Server error', error: error.message });
+            }
+          };
 }
 
 module.exports = new ManagerController();

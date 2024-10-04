@@ -28,7 +28,11 @@ const managerSchema = new mongoose.Schema({
      },
     kyc: { 
         type: String
-     },  
+     },
+     profilePicture: {
+        type: String,
+        default: ''
+      },  
     approved: {
          type: Boolean, 
          default: false 

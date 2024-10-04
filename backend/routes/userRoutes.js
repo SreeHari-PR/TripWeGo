@@ -3,6 +3,7 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const { googleLoginController } = require('../controllers/authController');
+const hotelController = require('../controllers/hotelController');
 const {profilePictureUpload} = require('../middlewares/multer');
 
 
@@ -21,4 +22,10 @@ router.post('/reset-password', userController.resetPasswordHandler);
 router.post('/resetpassword', authMiddleware, userController.userresetPassword);
 router.put('/profile', authMiddleware, userController.editProfile);
 router.post('/upload-profile-picture', authMiddleware, profilePictureUpload, userController.uploadProfilePictureHandler);
+
+
+//hotels
+router.get('/hotels', hotelController.listAllHotels);
+
+
 module.exports = router;

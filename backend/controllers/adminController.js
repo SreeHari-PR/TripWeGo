@@ -7,6 +7,7 @@ class AdminController {
         try {
             const { email, password } = req.body;
             const { token, user } = await adminService.loginAdmin(email, password);
+            
             res.send({ token, user });
         } catch (error) {
             res.status(400).send(error.message);
@@ -32,7 +33,7 @@ class AdminController {
         }
     }
 
-    // New function to get manager details for approval
+
     async getManagerDetails(req, res) {
          console.log('ksdjksdj')
         try {

@@ -33,15 +33,14 @@ const RegisterPage = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const licenseData = await uploadImageToCloudinary(license); // returns the URL
-      const kycData = await uploadImageToCloudinary(kyc); // returns the URL
-  
+      const licenseData = await uploadImageToCloudinary(license);
+      const kycData = await uploadImageToCloudinary(kyc);
       const formData = {
         name: managerData.name,
         email: managerData.email,
         password: managerData.password,
-        license: licenseData.url, // pass the URL from Cloudinary
-        kyc: kycData.url // pass the URL from Cloudinary
+        license: licenseData.url, 
+        kyc: kycData.url 
       };
       console.log(formData,'kjkjhj');
       

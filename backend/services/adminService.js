@@ -18,6 +18,8 @@ class AdminService {
         }
 
         const token = user.generateAuthToken();
+        console.log(token,'token');
+        
         return { token, user };
     }
 
