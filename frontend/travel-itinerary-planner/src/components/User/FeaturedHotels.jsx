@@ -1,38 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FaMapMarkerAlt, FaStar } from "react-icons/fa";
-import api from '../../services/api'; 
+import { useNavigate } from "react-router-dom";
 
-export default function FeaturedHotels() {
-  const [hotels, setHotels] = useState([]); 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); 
+export default function FeaturedHotels({ hotels }) {
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchHotels = async () => {
-      try {
-        const response = await api.get('/users/hotels'); 
-        setHotels(response.data.data); 
-      } catch (err) {
-        setError('Error fetching hotels');
-        console.error(err);
-      } finally {
-        setLoading(false); 
-      }
-    };
+  if (hotels.length === 0) return <p>No hotels to display</p>;
 
-    fetchHotels();
-  }, []); 
-
-  if (loading) return <p>Loading...</p>; 
-  if (error) return <p>{error}</p>; 
+  const handleNavigate = (id) => {
+    navigate(`/hotels/${id}`);
+  };
 
   return (
     <section className="py-16">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8">Featured Hotels</h2>
+        <h2 className="text-3xl font-bold mb-8">Hotels</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {hotels.map((hotel) => (
-            <div key={hotel._id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div
+              key={hotel._id}
+              className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
+              onClick={() => handleNavigate(hotel._id)}
+            >
               <img
                 src={hotel.images.mainImage || '/placeholder.svg?height=200&width=400&text=Hotel+' + hotel.name}
                 alt={hotel.name}
@@ -42,7 +31,6 @@ export default function FeaturedHotels() {
                 <h3 className="text-xl font-semibold mb-2">{hotel.name}</h3>
                 <p className="flex items-center mb-2">
                   <FaMapMarkerAlt className="w-4 h-4 mr-2 text-gray-500" />
-                  {/* Modify this line to display the location correctly */}
                   {hotel.location?.address}, {hotel.location?.city}, {hotel.location?.state}, {hotel.location?.country}
                 </p>
                 <p className="flex items-center mb-4">

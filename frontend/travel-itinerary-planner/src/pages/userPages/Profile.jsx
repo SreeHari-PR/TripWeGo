@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/authSlice';
+import StickyNavbar from '../../components/User/Navbar';
 import uploadImageToCloudinary from '../../utils/cloudinary';
 
 export default function ProfilePage() {
@@ -84,6 +85,7 @@ export default function ProfilePage() {
         if (data?.url) {
           setSelectedFile(data.url);
           toast.success('Image uploaded successfully');
+          handleSaveChanges(data.url);
         } else {
           toast.error('Image upload failed');
         }
@@ -92,28 +94,29 @@ export default function ProfilePage() {
       }
     }
   };
-
-  const handleSaveChanges = async () => {
+  
+  const handleSaveChanges= async (imageUrl) => {
     try {
       const token = localStorage.getItem('token');
       const updatedProfileWithImage = {
         ...updatedProfile,
-        profilePicture: selectedFile || profile.profilePicture,
+        profilePicture: imageUrl || profile.profilePicture,  
       };
-
+  
       await api.put('/users/profile', updatedProfileWithImage, {
         headers: {
           Authorization: ` ${token}`,
         },
       });
-      toast.success('Profile updated successfully');
       setProfile(updatedProfileWithImage); 
+      toast.success('Profile updated successfully');
       setIsEditing(false);
     } catch (error) {
       toast.error('Failed to update profile');
       console.error('Error updating profile:', error);
     }
   };
+  
 
   const handleCancel = () => {
     setIsEditing(false);
@@ -165,6 +168,8 @@ export default function ProfilePage() {
   if (!profile) return <div>No profile data</div>;
 
   return (
+    <div>
+      <StickyNavbar/>
     <div className="flex h-screen bg-[#002233]">
       {/* Sidebar */}
       <aside className="w-64 bg-[#0066FF] shadow-md">
@@ -312,6 +317,7 @@ export default function ProfilePage() {
         </div>
       </main>
       <ToastContainer />
+    </div>
     </div>
   );
 }

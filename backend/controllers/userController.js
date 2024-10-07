@@ -11,8 +11,8 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const token = await loginUser(req.body.email, req.body.password);
-        res.status(200).send({ message: 'Login successful', token });
+        const {token,user} = await loginUser(req.body.email, req.body.password);
+        res.status(200).send({ message: 'Login successful', token,user });
     } catch (error) {
         res.status(401).send({ message: error.message });
     }

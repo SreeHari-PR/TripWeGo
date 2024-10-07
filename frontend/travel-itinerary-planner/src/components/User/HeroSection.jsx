@@ -1,7 +1,8 @@
 import React from "react"
 import SearchForm from "./SearchForm";
 
-export default function HeroSection() {
+
+export default function HeroSection({ onSearch }) {
   return (
     <section className="bg-[#002233] text-white py-20">
       <div className="container mx-auto px-4">
@@ -9,7 +10,7 @@ export default function HeroSection() {
         <p className="mb-8">Discover amazing hotels at the best prices</p>
         <div className="bg-white text-gray-800 rounded-lg shadow-lg">
           <div className="p-6">
-            <SearchForm />
+            <SearchForm onSearch={onSearch} />
           </div>
         </div>
       </div>

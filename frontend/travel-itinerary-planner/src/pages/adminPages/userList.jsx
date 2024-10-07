@@ -14,7 +14,7 @@ const UserList = () => {
             try {
                 const response = await api.get('/admin/users', {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        Authorization: ` ${localStorage.getItem('token')}`,
                     },
                 });
                 setUsers(response.data);
@@ -42,7 +42,7 @@ const UserList = () => {
             try {
                 await api.put(`/users/${id}/block`, {}, {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        Authorization: `${localStorage.getItem('token')}`,
                     },
                 });
                 setUsers(users.map(user => user._id === id ? { ...user, isBlocked: true } : user));

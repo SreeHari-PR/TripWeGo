@@ -14,12 +14,42 @@ class HotelRepository {
 }
 async getAllHotels() {
     try {
-      const hotels = await Hotel.find(); // Fetch all hotels from the database
+      const hotels = await Hotel.find(); 
       return hotels;
     } catch (error) {
       throw new Error('Error fetching hotels: ' + error.message);
     }
   }
+  async findByLocation(location) {
+    try {
+      const regex = new RegExp(location, 'i'); // Create a case-insensitive regex
+
+      const hotels = await Hotel.find({
+        $or: [
+          { 'location.address': regex },
+          { 'location.city': regex },
+          { 'location.state': regex },
+          { 'location.country': regex },
+        ],
+      });
+      return hotels;
+      
+    } catch (error) {
+      throw new Error('Error finding hotels by location');
+    }
+  }
+  async getHotelById(hotelId) {
+
+    try {
+        const hotel = await Hotel.findById(hotelId).populate('services')
+        if (!hotel) {
+            throw new Error('Hotel not found');
+        }
+        return hotel;
+    } catch (error) {
+        throw new Error(`Error retrieving hotel: ${error.message}`);
+    }
+}
 }
 
 module.exports = new HotelRepository();

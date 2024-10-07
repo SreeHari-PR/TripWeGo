@@ -72,6 +72,7 @@ const resendOtp = async (email) => {
 
 const loginUser = async (email, password) => {
     const user = await findUserByEmail(email);
+    console.log(user,'user')
     if (!user) {
         throw new Error('Invalid email or password');
     }
@@ -86,7 +87,17 @@ const loginUser = async (email, password) => {
     }
 
     const token = user.generateAuthToken();
-    return token;
+    return { 
+        token,
+        user: {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            isBlocked: user.isBlocked,
+            verified: user.verified,
+        }
+    };
 };
 
 

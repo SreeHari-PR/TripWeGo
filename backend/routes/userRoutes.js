@@ -26,6 +26,8 @@ router.post('/upload-profile-picture', authMiddleware, profilePictureUpload, use
 
 //hotels
 router.get('/hotels', hotelController.listAllHotels);
+router.get('/search', hotelController.searchHotels);
+router.get('/hotels/:id', hotelController.getHotel);
 
 
 module.exports = router;

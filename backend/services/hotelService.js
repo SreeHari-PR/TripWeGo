@@ -6,7 +6,6 @@ const Joi = require('joi');
 
 class HotelService {
   async addHotel(managerId, hotelData,  { mainImageUrl, imageUrls }) {
-    // Joi validation schema for hotel data
     console.log(managerId,'id')
     delete hotelData.images;
     const schema = Joi.object({
@@ -51,27 +50,27 @@ class HotelService {
         openingDate: Joi.date().required(),
     });
 
-    // Validate the incoming hotel data
+    
     const { error } = schema.validate(hotelData);
     if (error) {
       console.log('Validation Error:', error.details);
         throw new Error(error.details[0].message);
     }
 
-    // Check if the category exists
+    
     const categoryExists = await Category.findById(hotelData.category);
     if (!categoryExists) {
         throw new Error('Invalid category selected.');
     }
 
-    // Check if the services exist (if services are provided)
+  
     const serviceIds = hotelData.services || [];
     const servicesExist = await Service.find({ '_id': { $in: serviceIds } });
     if (servicesExist.length !== serviceIds.length) {
         throw new Error('One or more selected services are invalid.');
     }
 
-    // Prepare the hotel data for insertion
+   
     const hotelToCreate = { 
         ...hotelData, 
         managerId, 
@@ -80,8 +79,6 @@ class HotelService {
           gallery: imageUrls,
         } 
     };
-
-    // Call the repository function to create the hotel
     return hotelRepository.createHotel(hotelToCreate);
 }
 
@@ -97,6 +94,22 @@ class HotelService {
       throw new Error('Error fetching hotels: ' + error.message);
     }
   }
+  async searchHotels(location) {
+    if (!location) {
+      throw new Error('Location is required for searching hotels');
+    }
+
+    const hotels = await hotelRepository.findByLocation(location);
+    return hotels;
+  }
+  async getSingleHotelPage(hotelId) {
+    try {
+        const hotel = await hotelRepository.getHotelById(hotelId);
+        return hotel;
+    } catch (error) {
+        throw new Error(`Failed to fetch hotel details: ${error.message}`);
+    }
+}
 }
 
 module.exports = new HotelService();

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaHotel, FaBars, FaTimes, FaUser, FaSearch, FaHeart, FaSuitcase } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const StickyNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +9,7 @@ const StickyNavbar = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const user = useSelector((state) => state.auth.user);
   console.log(user,'user');
+  
   
   const navigate = useNavigate();
 
@@ -30,18 +31,18 @@ const StickyNavbar = () => {
               <span className="ml-2 text-xl font-bold text-white">Trip We Go</span>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <a href="#" className="border-[#0066FF] text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <Link to="/" className="border-[#0066FF] text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                 Home
-              </a>
-              <a href="#" className="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              </Link>
+              <Link to="/hotels" className="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                 Hotels
-              </a>
-              <a href="#" className="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              </Link>
+              <Link to="/destinations" className="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                 Destinations
-              </a>
-              <a href="#" className="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              </Link>
+              <Link to="/deals" className="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                 Deals
-              </a>
+              </Link>
             </div>
           </div>
           <div className="hidden relative sm:ml-6 sm:flex sm:items-center">
@@ -74,11 +75,11 @@ const StickyNavbar = () => {
                 <FaUser className="h-8 w-8 rounded-full p-1 text-white" />
               </button>
 
-              {isLoggedIn && (
-                <div className="ml-3">
+              {/* {isLoggedIn && (
+                <div className="ml-3 float-left">
                   <span className="text-base font-medium text-white">{user?.name}</span>
                 </div>
-              )}
+              )} */}
             </div>
 
 
@@ -90,15 +91,15 @@ const StickyNavbar = () => {
                 </div>
                 <div className="border-t">
                   <div className="py-1">
-                    <a href="/profile" className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-[#003344]">
+                    <Link to="/profile" className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-[#003344]">
                       Your Profile
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-[#003344]">
+                    </Link>
+                    <Link to="/settings" className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-[#003344]">
                       Settings
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-[#003344]">
+                    </Link>
+                    <button onClick={() => navigate('/signout')} className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-[#003344]">
                       Sign out
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -123,18 +124,18 @@ const StickyNavbar = () => {
       {isOpen && (
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
-            <a href="#" className="bg-[#003344] border-[#0066FF] text-white block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+            <Link to="/" className="bg-[#003344] border-[#0066FF] text-white block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
               Home
-            </a>
-            <a href="#" className="border-transparent text-gray-300 hover:bg-[#003344] hover:border-gray-300 hover:text-white block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+            </Link>
+            <Link to="/hotels" className="border-transparent text-gray-300 hover:bg-[#003344] hover:border-gray-300 hover:text-white block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
               Hotels
-            </a>
-            <a href="#" className="border-transparent text-gray-300 hover:bg-[#003344] hover:border-gray-300 hover:text-white block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+            </Link>
+            <Link to="/destinations" className="border-transparent text-gray-300 hover:bg-[#003344] hover:border-gray-300 hover:text-white block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
               Destinations
-            </a>
-            <a href="#" className="border-transparent text-gray-300 hover:bg-[#003344] hover:border-gray-300 hover:text-white block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+            </Link>
+            <Link to="/deals" className="border-transparent text-gray-300 hover:bg-[#003344] hover:border-gray-300 hover:text-white block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
               Deals
-            </a>
+            </Link>
           </div>
           <div className="pt-4 pb-3 border-t border-[#003344]">
             <div className="flex items-center px-4">
@@ -153,20 +154,20 @@ const StickyNavbar = () => {
             <div className="mt-3 space-y-1">
               {isLoggedIn ? (
                 <>
-                  <a href="#" className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-[#003344]">
+                  <Link to="/profile" className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-[#003344]">
                     Your Profile
-                  </a>
-                  <a href="#" className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-[#003344]">
+                  </Link>
+                  <Link to="/settings" className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-[#003344]">
                     Settings
-                  </a>
-                  <a href="#" className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-[#003344]">
+                  </Link>
+                  <button onClick={() => navigate('/signout')} className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-[#003344]">
                     Sign out
-                  </a>
+                  </button>
                 </>
               ) : (
-                <a href="#" onClick={() => navigate('/login')} className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-[#003344]">
-                  Login
-                </a>
+                <Link to="/login" className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-[#003344]">
+                  Sign in
+                </Link>
               )}
             </div>
           </div>

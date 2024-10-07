@@ -3,15 +3,15 @@
 const express = require('express');
 const adminController = require('../controllers/adminController');
 const categoryController=require('../controllers/categoryController')
-const adminAuthMiddleware=require('../middlewares/adminMiddleware')
+const authMiddleware=require('../middlewares/authMiddleware')
 const serviceController=require('../controllers/serviceController')
 const router = express.Router();
 
 
 
 router.post('/login', adminController.login);
-router.get('/users', adminController.listUsers);
-router.get('/managers', adminController.listManagers);
+router.get('/users',authMiddleware, adminController.listUsers);
+router.get('/managers',authMiddleware, adminController.listManagers);
 router.get('/managers/:id', adminController.getManagerDetails);
 router.post('/managers/:id/approve', adminController.approveManager);
 router.post('/users/:id/block', adminController.blockUser);

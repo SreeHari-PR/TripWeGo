@@ -18,7 +18,7 @@ export default function AdminManagerList() {
         
         const response = await api.get('/admin/managers', {
           headers: {
-            Authorization: `Bearer ${token}` 
+            Authorization: `${token}` 
           }
         });
         setManagers(response.data);

@@ -66,6 +66,42 @@ class HotelController {
               });
             }
           }
+          async searchHotels(req, res) {
+            console.log('gsjhdgfj');
+            
+            const { location } = req.query;
+            console.log(req.query,'location')
+        
+            try {
+              const hotels = await hotelService.searchHotels(location);
+              console.log(hotels,'searched');
+              
+              return res.status(200).json(hotels);
+            } catch (error) {
+              return res.status(500).json({ error: error.message });
+            }
+          }
+          async getHotel(req, res) {
+            const hotelId = req.params.id;
+    
+            try {
+                const hotel = await hotelService.getSingleHotelPage(hotelId);
+                const serviceNames = hotel.services.map(service => service.name);
+                console.log(serviceNames)
+                res.status(200).json({
+                    success: true,
+                    hotel: {
+                      ...hotel.toObject(),
+                      services: serviceNames 
+                    }
+                });
+            } catch (error) {
+                res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+        }
           
 
 }
