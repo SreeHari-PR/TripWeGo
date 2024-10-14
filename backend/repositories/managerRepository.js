@@ -37,6 +37,23 @@ class ManagerRepository {
           throw new Error('Error updating profile picture');
         }
       }
+      async getManagersWithHotelCount() {
+        return Manager.aggregate([
+          {
+            $lookup: {
+              from: 'hotels', 
+              localField: '_id',
+              foreignField: 'managerId',
+              as: 'hotels',
+            },
+          },
+          {
+            $addFields: {
+              hotelCount: { $size: '$hotels' },
+            },
+          },
+        ]);
+      }
 }
 
 module.exports = new ManagerRepository();

@@ -57,45 +57,45 @@ export default function HotelListing() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredHotels.map(hotel => (
-            <div
-              key={hotel._id}
-              className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"
-              onClick={() => navigate(`/hotels/${hotel._id}`)}
-            >
-              <img src={hotel.images.mainImage} alt={hotel.name} className="w-full h-48 object-cover" />
-              <div className="p-4">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-xl font-semibold">{hotel.name}</h3>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation(); 
-                      toggleFavorite(hotel._id);
-                    }}
-                    className="text-2xl focus:outline-none"
-                    aria-label={favorites.includes(hotel._id) ? "Remove from favorites" : "Add to favorites"}
-                  >
-                    <FaHeart className={favorites.includes(hotel._id) ? "text-red-500" : "text-gray-300"} />
-                  </button>
-                </div>
-                <div className="flex items-center space-x-1 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <FaStar
-                      key={i}
-                      className={`h-5 w-5 ${i < Math.floor(hotel.rating) ? "text-yellow-400" : "text-gray-300"}`}
-                    />
-                  ))}
-                  <span className="ml-2 text-sm text-gray-600">{hotel.rating.toFixed(1)}</span>
-                </div>
-                <button
-                  className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
-                  onClick={(e) => {
-                    e.stopPropagation(); 
-                  }}
-                >
-                  Book Now
-                </button>
-              </div>
-            </div>
+         <div
+         key={hotel._id}
+         className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-105"
+         onClick={() => navigate(`/hotels/${hotel._id}`)}
+       >
+         <img src={hotel.images.mainImage} alt={hotel.name} className="w-full h-48 object-cover" />
+         <div className="p-4">
+           <div className="flex justify-between items-center mb-2">
+             <h3 className="text-xl font-semibold">{hotel.name}</h3>
+             <button
+               onClick={(e) => {
+                 e.stopPropagation(); 
+                 toggleFavorite(hotel._id);
+               }}
+               className="text-2xl focus:outline-none"
+               aria-label={favorites.includes(hotel._id) ? "Remove from favorites" : "Add to favorites"}
+             >
+               <FaHeart className={favorites.includes(hotel._id) ? "text-red-500" : "text-gray-300"} />
+             </button>
+           </div>
+           <div className="flex items-center space-x-1 mb-2">
+             {[...Array(5)].map((_, i) => (
+               <FaStar
+                 key={i}
+                 className={`h-5 w-5 ${i < Math.floor(hotel.rating) ? "text-yellow-400" : "text-gray-300"}`}
+               />
+             ))}
+             <span className="ml-2 text-sm text-gray-600">{hotel.rating.toFixed(1)}</span>
+           </div>
+           <button
+             className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300 ease-in-out"
+             onClick={(e) => {
+               e.stopPropagation(); 
+             }}
+           >
+             Book Now
+           </button>
+         </div>
+       </div>
           ))}
         </div>
 

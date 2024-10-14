@@ -9,12 +9,12 @@ class HotelRepository {
 
   async findAllByManager(managerId) {
     return Hotel.find({ managerId: managerId })
-    .populate('category', 'name')    
-    .populate('services', 'name');   
-}
-async getAllHotels() {
+      .populate('category', 'name')
+      .populate('services', 'name');
+  }
+  async getAllHotels() {
     try {
-      const hotels = await Hotel.find(); 
+      const hotels = await Hotel.find();
       return hotels;
     } catch (error) {
       throw new Error('Error fetching hotels: ' + error.message);
@@ -33,7 +33,7 @@ async getAllHotels() {
         ],
       });
       return hotels;
-      
+
     } catch (error) {
       throw new Error('Error finding hotels by location');
     }
@@ -41,15 +41,19 @@ async getAllHotels() {
   async getHotelById(hotelId) {
 
     try {
-        const hotel = await Hotel.findById(hotelId).populate('services')
-        if (!hotel) {
-            throw new Error('Hotel not found');
-        }
-        return hotel;
+      const hotel = await Hotel.findById(hotelId).populate('services')
+      if (!hotel) {
+        throw new Error('Hotel not found');
+      }
+      return hotel;
     } catch (error) {
-        throw new Error(`Error retrieving hotel: ${error.message}`);
+      throw new Error(`Error retrieving hotel: ${error.message}`);
     }
-}
+  }
+  async countByManagerId(managerId) {
+    return Hotel.countDocuments({ managerId });
+  }
+
 }
 
 module.exports = new HotelRepository();

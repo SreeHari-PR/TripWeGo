@@ -1,15 +1,15 @@
-import React from "react";
-import { FaMapMarkerAlt, FaStar } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import React from "react"
+import { FaMapMarkerAlt, FaStar } from "react-icons/fa"
+import { useNavigate } from "react-router-dom"
 
 export default function FeaturedHotels({ hotels }) {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  if (hotels.length === 0) return <p>No hotels to display</p>;
+  if (hotels.length === 0) return <p>No hotels to display</p>
 
   const handleNavigate = (id) => {
-    navigate(`/hotels/${id}`);
-  };
+    navigate(`/hotels/${id}`)
+  }
 
   return (
     <section className="py-16">
@@ -19,11 +19,11 @@ export default function FeaturedHotels({ hotels }) {
           {hotels.map((hotel) => (
             <div
               key={hotel._id}
-              className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
+              className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl"
               onClick={() => handleNavigate(hotel._id)}
             >
               <img
-                src={hotel.images.mainImage || '/placeholder.svg?height=200&width=400&text=Hotel+' + hotel.name}
+                src={hotel.images.mainImage || `/placeholder.svg?height=200&width=400&text=Hotel+${hotel.name}`}
                 alt={hotel.name}
                 className="w-full h-48 object-cover"
               />
@@ -37,7 +37,7 @@ export default function FeaturedHotels({ hotels }) {
                   <FaStar className="w-4 h-4 mr-2 text-yellow-400" /> {hotel.rating} ({hotel.reviews} reviews)
                 </p>
                 <div className="flex justify-between items-center">
-                  <button className="bg-[#0066FF] hover:bg-[#002233] text-white font-bold py-2 px-4 rounded">
+                  <button className="bg-[#0066FF] hover:bg-[#002233] text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
                     Book Now
                   </button>
                 </div>
@@ -47,5 +47,5 @@ export default function FeaturedHotels({ hotels }) {
         </div>
       </div>
     </section>
-  );
+  )
 }

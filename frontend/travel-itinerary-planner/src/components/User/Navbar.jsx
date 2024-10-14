@@ -46,10 +46,6 @@ const StickyNavbar = () => {
             </div>
           </div>
           <div className="hidden relative sm:ml-6 sm:flex sm:items-center">
-            <button className="p-1 rounded-full text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066FF]">
-              <span className="sr-only">Search</span>
-              <FaSearch className="h-6 w-6" />
-            </button>
             <button className="ml-3 p-1 rounded-full text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066FF]">
               <span className="sr-only">Favorites</span>
               <FaHeart className="h-6 w-6" />

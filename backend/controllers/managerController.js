@@ -12,6 +12,7 @@ class ManagerController {
           const managerData = {
             ...req.body,
           };
+          console.log(managerData,'sgd')
       
           const result = await managerService.registerManager(managerData);
           res.status(200).send(result);
@@ -73,6 +74,8 @@ class ManagerController {
 
     async blockManager(req, res) {
         const { managerId } = req.body;
+        console.log(req.body,'managwr');
+        
         try {
             const manager = await managerService.blockManager(managerId);
             res.status(200).send({ message: 'Manager blocked successfully', manager });

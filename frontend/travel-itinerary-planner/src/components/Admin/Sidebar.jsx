@@ -39,7 +39,7 @@ export default function AdminSidebar() {
     { icon: FaChartBar, text: 'services', route: '/admin/services' },
     { icon: FaComments, text: 'Reviews', route: '/admin/reviews' },
     { icon: FaTags, text: 'Promotions', route: '/admin/promotions' },
-    { icon: FaCog, text: 'Settings', route: '/admin/settings' },
+    // { icon: FaCog, text: 'Settings', route: '/admin/settings' },
   ];
 
   return (

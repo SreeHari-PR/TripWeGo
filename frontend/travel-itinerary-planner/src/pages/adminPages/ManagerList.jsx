@@ -1,83 +1,127 @@
-import React, { useState, useEffect } from 'react';
-import { FaEdit, FaTrash, FaEye, FaSearch, FaPlus, FaTimes } from 'react-icons/fa';
-import api from '../../services/api';
-import AdminSidebar from '../../components/Admin/Sidebar';
+
+
+import React, { useState, useEffect } from 'react'
+import { FaEdit, FaTrash, FaEye, FaSearch, FaPlus, FaTimes, FaLock, FaLockOpen } from 'react-icons/fa'
+import Swal from 'sweetalert2'
+import api from '../../services/api'
+import AdminSidebar from '../../components/Admin/Sidebar'
 
 export default function AdminManagerList() {
-  const [managers, setManagers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedManager, setSelectedManager] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [managers, setManagers] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedManager, setSelectedManager] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [loadingDetails, setLoadingDetails] = useState(false)
 
   useEffect(() => {
-    const fetchManagers = async () => {
-      try {
-        const token = localStorage.getItem('token'); 
-        console.log(token,'token');
-        
-        const response = await api.get('/admin/managers', {
-          headers: {
-            Authorization: `${token}` 
-          }
-        });
-        setManagers(response.data);
-      } catch (error) {
-        console.error('Error fetching managers:', error);
-      }
-    };
-    fetchManagers();
-  }, []);
+    fetchManagers()
+  }, [])
+
+  const fetchManagers = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await api.get('/admin/managers', {
+        headers: {
+          Authorization: `${token}`
+        }
+      })
+      setManagers(response.data)
+    } catch (error) {
+      console.error('Error fetching managers:', error)
+    }
+  }
 
   const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  };
+    setSearchTerm(event.target.value)
+  }
 
   const filteredManagers = managers.filter((manager) =>
     manager.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     manager.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  )
 
   const handleViewDetails = async (manager) => {
     try {
-      setLoadingDetails(true);
-      const response = await api.get(`/admin/managers/${manager._id}`);
-      setSelectedManager(response.data);
-      setIsModalOpen(true);
-      setLoadingDetails(false);
+      setLoadingDetails(true)
+      const response = await api.get(`/admin/managers/${manager._id}`)
+      setSelectedManager(response.data)
+      setIsModalOpen(true)
+      setLoadingDetails(false)
     } catch (error) {
-      console.error('Error fetching manager details:', error);
-      setLoadingDetails(false);
+      console.error('Error fetching manager details:', error)
+      setLoadingDetails(false)
     }
-  };
+  }
 
   const handleApprove = async (managerId) => {
     try {
-      await api.post(`/admin/managers/${managerId}/approve`);
-      setSelectedManager({ ...selectedManager, approved: true });
-      alert('Manager approved successfully.');
+      await api.post(`/admin/managers/${managerId}/approve`)
+      setSelectedManager({ ...selectedManager, approved: true })
+      Swal.fire('Success', 'Manager approved successfully.', 'success')
+      fetchManagers()
     } catch (error) {
-      console.error('Error approving manager:', error);
+      console.error('Error approving manager:', error)
+      Swal.fire('Error', 'Failed to approve manager.', 'error')
+    }
+  }
+  const handleBlockUnblock = async (managerId, currentStatus) => {
+    const action = currentStatus === 'Blocked' ? 'unblock' : 'block';
+    const confirmResult = await Swal.fire({
+      title: `Are you sure you want to ${action} this manager?`,
+      text: `This will ${action} the manager's access to the system.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: `Yes, ${action} it!`
+    });
+  
+    if (confirmResult.isConfirmed) {
+      try {
+        await api.post(`/admin/managers/${action}`, {
+          managerId // Send managerId in the request body
+        });
+  
+        Swal.fire('Success', `Manager ${action}ed successfully.`, 'success');
+        
+        // Fetch the updated manager list
+        fetchManagers();
+        
+        // Update selectedManager state if it's the currently viewed manager
+        if (selectedManager && selectedManager._id === managerId) {
+          setSelectedManager({
+            ...selectedManager,
+            status: action === 'block' ? 'Blocked' : 'Active'
+          });
+        }
+  
+      } catch (error) {
+        console.error(`Error ${action}ing manager:`, error);
+        Swal.fire('Error', `Failed to ${action} manager.`, 'error');
+      }
     }
   };
+  
 
   const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedManager(null);
-  };
+    setIsModalOpen(false)
+    setSelectedManager(null)
+  }
 
   const getStatusColor = (status) => {
     switch (status) {
       case 'Active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'Inactive':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800'
       case 'Pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800'
+      case 'Blocked':
+        return 'bg-gray-100 text-gray-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
-  };
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -151,12 +195,13 @@ export default function AdminManagerList() {
                       <button className="text-blue-600 hover:text-blue-900" title="View Details" onClick={() => handleViewDetails(manager)}>
                         <FaEye />
                       </button>
-                      {/* <button className="text-green-600 hover:text-green-900" title="Edit">
-                        <FaEdit />
+                      <button
+                        className={manager.status === 'Blocked' ? "text-green-600 hover:text-green-900" : "text-red-600 hover:text-red-900"}
+                        title={manager.status === 'Blocked' ? "Unblock" : "Block"}
+                        onClick={() => handleBlockUnblock(manager._id, manager.status)}
+                      >
+                        {manager.status === 'Blocked' ? <FaLockOpen /> : <FaLock />}
                       </button>
-                      <button className="text-red-600 hover:text-red-900" title="Delete">
-                        <FaTrash />
-                      </button> */}
                     </div>
                   </td>
                 </tr>
@@ -189,15 +234,22 @@ export default function AdminManagerList() {
               {!selectedManager.approved && (
                 <button
                   onClick={() => handleApprove(selectedManager._id)}
-                  className="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                  className="mt-4 w-full bg-green-500 text-white hover:bg-green-600"
                 >
                   Approve Manager
                 </button>
               )}
+
+              <button
+                onClick={() => handleBlockUnblock(selectedManager._id, selectedManager.status)}
+                className={`mt-4 w-full ${selectedManager.status === 'Blocked' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'} text-white`}
+              >
+                {selectedManager.status === 'Blocked' ? 'Unblock Manager' : 'Block Manager'}
+              </button>
             </div>
           </div>
         )}
       </div>
     </div>
-  );
+  )
 }

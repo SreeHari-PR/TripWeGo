@@ -8,8 +8,7 @@ import Register from './pages/userPages/Register';
 import UserProfile from './pages/userPages/Profile';
 import AdminLogin from './pages/adminPages/adminLogin';
 import AdminDashboard from './pages/adminPages/adminDashboard';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from 'react-hot-toast';
 import Home from './pages/userPages/Home';
 import VerifyOtp from './pages/userPages/VerifyOtp';
 import ManagerOtpPage from './pages/managerPages/ManagerOtpPage';
@@ -41,7 +40,7 @@ const App = () => {
     <Provider store={store}>
       <Router>
       <Loader isLoading={isLoading}>
-        <ToastContainer />
+      <Toaster position="top-center" reverseOrder={false} />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

@@ -138,6 +138,9 @@ class ManagerService {
         const updatedManager = await updateManager(managerId, updateData);
         return updatedManager;
       }
+      async getManagersWithHotelCount() {
+        return managerRepository.getManagersWithHotelCount();
+      }
 }
 
 module.exports = ManagerService;

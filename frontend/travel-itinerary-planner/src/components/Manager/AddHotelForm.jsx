@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaHotel, FaMapMarkerAlt, FaPhone, FaEnvelope, FaGlobe, FaImage, FaBed, FaCog, FaStar, FaClock, FaCalendarAlt, FaTimes, FaPlus, FaAlignLeft, FaTag } from 'react-icons/fa';
 import api from '../../services/api';
 import uploadImageToCloudinary from '../../utils/cloudinary';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 const AddHotelForm = ({ onSubmit, onCancel }) => {
@@ -158,7 +158,6 @@ const AddHotelForm = ({ onSubmit, onCancel }) => {
             });
         } catch (error) {
             console.error('Error adding hotel:', error);
-            toast.error('Failed to add hotel, please try again.',error);
         }
     };
 
@@ -413,9 +412,9 @@ const AddHotelForm = ({ onSubmit, onCancel }) => {
                                         type="text"
                                         name="type"
                                         id="roomType"
-                                        className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                        className="mt-1 h-12 py-3 px-4 border-2 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm rounded-md"
                                         value={newRoomType.type}
-                                        onChange={(e) => setNewRoomType({...newRoomType, type: e.target.value})}
+                                        onChange={(e) => setNewRoomType({ ...newRoomType, type: e.target.value })}
                                     />
                                 </div>
                                 <div>
@@ -424,9 +423,9 @@ const AddHotelForm = ({ onSubmit, onCancel }) => {
                                         type="number"
                                         name="number"
                                         id="roomNumber"
-                                        className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                        className="mt-1 h-12 py-3 px-4 border-2 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm rounded-md"
                                         value={newRoomType.number}
-                                        onChange={(e) => setNewRoomType({...newRoomType, number: e.target.value})}
+                                        onChange={(e) => setNewRoomType({ ...newRoomType, number: e.target.value })}
                                     />
                                 </div>
                                 <div>
@@ -435,9 +434,9 @@ const AddHotelForm = ({ onSubmit, onCancel }) => {
                                         type="number"
                                         name="price"
                                         id="roomPrice"
-                                        className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                        className="mt-1 h-12 py-3 px-4 border-2 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm rounded-md"
                                         value={newRoomType.price}
-                                        onChange={(e) => setNewRoomType({...newRoomType, price: e.target.value})}
+                                        onChange={(e) => setNewRoomType({ ...newRoomType, price: e.target.value })}
                                     />
                                 </div>
                             </div>
@@ -462,7 +461,7 @@ const AddHotelForm = ({ onSubmit, onCancel }) => {
                                                 className="text-red-600 hover:text-red-900"
                                                 onClick={() => {
                                                     const newRoomTypes = hotel.roomTypes.filter((_, i) => i !== index);
-                                                    setHotel(prevHotel => ({...prevHotel, roomTypes: newRoomTypes}));
+                                                    setHotel(prevHotel => ({ ...prevHotel, roomTypes: newRoomTypes }));
                                                 }}
                                             >
                                                 Remove
@@ -473,105 +472,110 @@ const AddHotelForm = ({ onSubmit, onCancel }) => {
                             </div>
                         </div>
                     </div>
+
+
                 );
             case 5:
                 return (
                     <div className="bg-white p-8 rounded-lg shadow-lg max-w-3xl mx-auto">
-                        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Services & Details</h2>
-                        <div className="space-y-6">
-                            <div>
-                                <label className="block text-lg font-medium text-gray-700 mb-2">Services</label>
-                                <div className="mt-2 space-y-2">
-                                    {availableServices.length > 0 ? (
-                                        availableServices.map(service => (
-                                            service._id && service.name && (
-                                                <div key={service._id} className="flex items-center">
-                                                    <input
-                                                        id={service._id}
-                                                        name="services"
-                                                        type="checkbox"
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                                        checked={hotel.services.includes(service._id)}
-                                                        onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                setHotel(prevHotel => ({
-                                                                    ...prevHotel,
-                                                                    services: [...prevHotel.services, service._id]
-                                                                }));
-                                                            } else {
-                                                                setHotel(prevHotel => ({
-                                                                    ...prevHotel,
-                                                                    services: prevHotel.services.filter(id => id !== service._id)
-                                                                }));
-                                                            }
-                                                        }}
-                                                    />
-                                                    <label htmlFor={service._id} className="ml-2 block text-sm text-gray-900">
-                                                        {service.name}
-                                                    </label>
-                                                </div>
-                                            )
-                                        ))
-                                    ) : (
-                                        <p>No services available</p>
-                                    )}
-                                </div>
+    <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Services & Details</h2>
+    <div className="space-y-6">
+        <div>
+            <label className="block text-lg font-medium text-gray-700 mb-2">Services</label>
+            <div className="mt-2 space-y-2">
+                {availableServices.length > 0 ? (
+                    availableServices.map(service => (
+                        service._id && service.name && (
+                            <div key={service._id} className="flex items-center">
+                                <input
+                                    id={service._id}
+                                    name="services"
+                                    type="checkbox"
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                    checked={hotel.services.includes(service._id)}
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setHotel(prevHotel => ({
+                                                ...prevHotel,
+                                                services: [...prevHotel.services, service._id]
+                                            }));
+                                        } else {
+                                            setHotel(prevHotel => ({
+                                                ...prevHotel,
+                                                services: prevHotel.services.filter(id => id !== service._id)
+                                            }));
+                                        }
+                                    }}
+                                />
+                                <label htmlFor={service._id} className="ml-2 block text-sm text-gray-900">
+                                    {service.name}
+                                </label>
                             </div>
-                            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                                <div className="sm:col-span-3">
-                                    <label htmlFor="checkInTime" className="block text-sm font-medium text-gray-700">Check-in Time</label>
-                                    <div className="mt-1 relative rounded-md shadow-sm">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <FaClock className="h-5 w-5 text-gray-400" />
-                                        </div>
-                                        <input
-                                            type="time"
-                                            name="checkInTime"
-                                            id="checkInTime"
-                                            className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-                                            value={hotel.checkInTime}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                <div className="sm:col-span-3">
-                                    <label htmlFor="checkOutTime" className="block text-sm font-medium text-gray-700">Check-out Time</label>
-                                    <div className="mt-1 relative rounded-md shadow-sm">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <FaClock className="h-5 w-5 text-gray-400" />
-                                        </div>
-                                        <input
-                                            type="time"
-                                            name="checkOutTime"
-                                            id="checkOutTime"
-                                            className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-                                            value={hotel.checkOutTime}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <label htmlFor="openingDate" className="block text-sm font-medium text-gray-700">Opening Date</label>
-                                <div className="mt-1 relative rounded-md shadow-sm">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <FaCalendarAlt className="h-5 w-5 text-gray-400" />
-                                    </div>
-                                    <input
-                                        type="date"
-                                        name="openingDate"
-                                        id="openingDate"
-                                        className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-                                        value={hotel.openingDate}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                        )
+                    ))
+                ) : (
+                    <p>No services available</p>
+                )}
+            </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <div className="sm:col-span-3">
+                <label htmlFor="checkInTime" className="block text-sm font-medium text-gray-700">Check-in Time</label>
+                <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FaClock className="h-5 w-5 text-gray-400" />
                     </div>
+                    <input
+                        type="time"
+                        name="checkInTime"
+                        id="checkInTime"
+                        className="h-12 py-3 pl-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full border-2 border-gray-300 rounded-md sm:text-sm"
+                        value={hotel.checkInTime}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+            </div>
+            <div className="sm:col-span-3">
+                <label htmlFor="checkOutTime" className="block text-sm font-medium text-gray-700">Check-out Time</label>
+                <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FaClock className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                        type="time"
+                        name="checkOutTime"
+                        id="checkOutTime"
+                        className="h-12 py-3 pl-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full border-2 border-gray-300 rounded-md sm:text-sm"
+                        value={hotel.checkOutTime}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <label htmlFor="openingDate" className="block text-sm font-medium text-gray-700">Opening Date</label>
+            <div className="mt-1 relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FaCalendarAlt className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                    type="date"
+                    name="openingDate"
+                    id="openingDate"
+                    className="h-12 py-3 pl-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full border-2 border-gray-300 rounded-md sm:text-sm"
+                    value={hotel.openingDate}
+                    onChange={handleChange}
+                    required
+                />
+            </div>
+        </div>
+    </div>
+</div>
+
                 );
             default:
                 return null;
@@ -582,6 +586,7 @@ const AddHotelForm = ({ onSubmit, onCancel }) => {
         <form onSubmit={handleSubmit} className="space-y-8">
             {renderStep()}
             <div className="flex justify-between max-w-3xl mx-auto">
+
                 <button
                     type="button"
                     className="bg-gray-200 text-gray-700 py-3 px-6 rounded-lg shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors"
@@ -589,19 +594,25 @@ const AddHotelForm = ({ onSubmit, onCancel }) => {
                 >
                     {step > 1 ? 'Previous' : 'Cancel'}
                 </button>
-                <button
-                    type={step === 5 ? 'submit' : 'button'}
-                    className="bg-blue-600 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                    onClick={() => step < 5 && setStep(step + 1)}
-                >
-                    {step === 5 ?
+                {step < 5 ? (
+                    <button
+                        type="button"
+                        className="bg-blue-600 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                        onClick={() => setStep(step + 1)}
+                    >
+                        Next
+                    </button>
+                ) : (
+                    <button
+                        type="submit"
+                        className="bg-blue-600 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                    >
                         <span className="flex items-center">
                             <FaPlus className="mr-2" />
                             Submit
-                        </span> :
-                        'Next'
-                    }
-                </button>
+                        </span>
+                    </button>
+                )}
             </div>
         </form>
     );

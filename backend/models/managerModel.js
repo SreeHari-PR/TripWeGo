@@ -32,7 +32,11 @@ const managerSchema = new mongoose.Schema({
      profilePicture: {
         type: String,
         default: ''
-      },  
+      },
+      isBlocked: {
+        type: Boolean,
+        default: false
+    },   
     approved: {
          type: Boolean, 
          default: false 

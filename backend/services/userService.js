@@ -1,7 +1,7 @@
 
 require('dotenv').config();
 const bcrypt = require('bcrypt');
-const { findUserById, findUserByEmail, createUser, updateUserPassword, updateUserProfile,updateUserProfilePicture,updatePassword } = require('../repositories/userRepository');
+const { findUserById, findUserByEmail, createUser, updateUserPassword, updateUserProfile,updateUserProfilePicture,updatePassword,getUserById } = require('../repositories/userRepository');
 const { validate } = require('../models/userModel');
 const sendEmail = require('../utils/sendEmail');
 const generateOtp = require('../utils/generateOtp')
@@ -200,7 +200,7 @@ const handleProfilePictureUpload = async (userId, profilePicturePath) => {
     }
 };
    const forgotPassword=async (userId, currentPassword, newPassword) =>{
-    const user = await userRepository.getUserById(userId);
+    const user = await findUserById(userId);
     console.log(user,'userdetails');
     
 
@@ -215,7 +215,7 @@ const handleProfilePictureUpload = async (userId, profilePicturePath) => {
       throw new Error('Current password is incorrect');
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await userRepository.updatePassword(userId, hashedPassword);
+    await  updatePassword(userId, hashedPassword);
 
     return { message: 'Password updated successfully' };
   }

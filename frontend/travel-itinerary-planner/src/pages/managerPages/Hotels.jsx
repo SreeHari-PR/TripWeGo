@@ -28,19 +28,19 @@ const AdminHotelsPage = () => {
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-3xl font-bold">Hotel Management</h1>
               {!showForm && (
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  <FaPlus className="mr-2" />
-                  Add Hotel
-                </button>
+               <button
+               onClick={() => setShowForm(true)}
+               className="flex items-center px-4 py-2 bg-[#0066FF] text-white rounded-md hover:bg-[#0055cc] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066FF]"
+             >
+               <FaPlus className="mr-2" />
+               Add Hotel
+             </button>
               )}
             </div>
             
             {showForm ? (
              <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-                <AddHotelForm onAddHotel={handleAddHotel} onCancel={() => setShowForm(false)} />
+                <AddHotelForm onSubmit={handleAddHotel} onCancel={() => setShowForm(false)} />
               </div>
             ) : (
               <HotelList hotels={hotels} />

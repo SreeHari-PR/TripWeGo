@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaBell, FaUser, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-hot-toast';
 
 export function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { FaBookOpen, FaSignOutAlt, FaUser, FaHotel } from 'react-icons/fa';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { FaHome, FaUser, FaBookOpen, FaSignOutAlt, FaCamera, FaEnvelope, FaLock } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { logout } from '../../redux/authSlice';
 import StickyNavbar from '../../components/User/Navbar';
 import uploadImageToCloudinary from '../../utils/cloudinary';
@@ -18,7 +18,7 @@ export default function ProfilePage() {
     email: '',
   });
   const [selectedFile, setSelectedFile] = useState(null);
-  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [resetPasswordData, setResetPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -28,22 +28,19 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-
   const handleLogout = () => {
     dispatch(logout());
-    toast.success('Logged out successfully');
     setTimeout(() => {
       navigate('/login');
     }, 1500);
   };
-
 
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await api.get('/users/profile', {
         headers: {
-          Authorization: ` ${token}`, 
+          Authorization: ` ${token}`,
         },
       });
       setProfile(response.data);
@@ -65,10 +62,6 @@ export default function ProfilePage() {
     fetchProfile();
   }, [navigate]);
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setUpdatedProfile({
@@ -84,7 +77,6 @@ export default function ProfilePage() {
         const data = await uploadImageToCloudinary(file);
         if (data?.url) {
           setSelectedFile(data.url);
-          toast.success('Image uploaded successfully');
           handleSaveChanges(data.url);
         } else {
           toast.error('Image upload failed');
@@ -94,36 +86,27 @@ export default function ProfilePage() {
       }
     }
   };
-  
-  const handleSaveChanges= async (imageUrl) => {
+
+  const handleSaveChanges = async (imageUrl) => {
     try {
       const token = localStorage.getItem('token');
       const updatedProfileWithImage = {
         ...updatedProfile,
-        profilePicture: imageUrl || profile.profilePicture,  
+        profilePicture: imageUrl || profile.profilePicture,
       };
-  
+
       await api.put('/users/profile', updatedProfileWithImage, {
         headers: {
           Authorization: ` ${token}`,
         },
       });
-      setProfile(updatedProfileWithImage); 
+      setProfile(updatedProfileWithImage);
       toast.success('Profile updated successfully');
       setIsEditing(false);
     } catch (error) {
       toast.error('Failed to update profile');
       console.error('Error updating profile:', error);
     }
-  };
-  
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    setUpdatedProfile({
-      name: profile.name,
-      email: profile.email,
-    });
   };
 
   const handleResetPasswordChange = (e) => {
@@ -156,169 +139,191 @@ export default function ProfilePage() {
       });
 
       toast.success('Password reset successfully');
-      setShowResetPassword(false);
       setResetPasswordData({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
+      setShowResetPasswordModal(false);
     } catch (error) {
       toast.error('Failed to reset password');
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="flex justify-center items-center h-screen bg-[#0066FF] text-white">Loading...</div>;
 
-  if (!profile) return <div>No profile data</div>;
+  if (!profile) return <div className="flex justify-center items-center h-screen bg-[#0066FF] text-white">No profile data</div>;
 
   return (
-    <div>
-      <StickyNavbar/>
-    <div className="flex h-screen bg-[#002233]">
-      {/* Sidebar */}
-      <aside className="w-64 bg-[#0066FF] shadow-md">
-        <nav className="p-4 space-y-2">
-          <button className="flex items-center space-x-2 p-2 bg-[#004466] rounded text-white" onClick={() => navigate('/')}>
-            <FaHotel className="h-5 w-5" />
-            <span>Home</span>
-          </button>
-          <a href="#" className="flex items-center space-x-2 p-2 bg-[#004466] rounded text-white">
-            <FaUser className="h-5 w-5" />
-            <span>Profile</span>
-          </a>
-          <a href="#" className="flex items-center space-x-2 p-2 hover:bg-[#004466] rounded text-white">
-            <FaBookOpen className="h-5 w-5" />
-            <span>Bookings</span>
-          </a>
-          <a href="#" className="flex items-center space-x-2 p-2 hover:bg-[#004466] rounded text-white" onClick={handleLogout}>
-            <FaSignOutAlt className="h-5 w-5" />
-            <span>Logout</span>
-          </a>
-        </nav>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-8">
-        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
-          <div className="p-4 border-b">
-            <h2 className="text-2xl font-bold text-[#002233]">Profile</h2>
-          </div>
-          <div className="p-4 space-y-4">
-            <div className="flex items-center space-x-4">
-              <div className="h-24 w-24 bg-gray-300 rounded-full flex items-center justify-center">
-                <img
-                  src={profile.profilePicture || '/placeholder.svg?height=96&width=96'}
-                  alt="Profile picture"
-                  className="h-full w-full rounded-full object-cover"
-                />
-              </div>
-              <button className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100" onClick={() => fileInputRef.current.click()}>
-                Add Photo
+    <div className="min-h-screen">
+      <StickyNavbar />
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-6">
+          <div className="bg-[#002233] shadow rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4 text-white">Navigation</h2>
+            <nav className="space-y-2">
+              <Link to="/" className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white hover:bg-[#003355] rounded-md transition duration-150 ease-in-out">
+                <FaHome className="h-5 w-5" />
+                <span>Home</span>
+              </Link>
+              <Link to="/profile" className="flex items-center space-x-2 px-4 py-2 text-sm font-medium bg-[#003355] text-white rounded-md">
+                <FaUser className="h-5 w-5" />
+                <span>Profile</span>
+              </Link>
+              <Link to="/bookings" className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white hover:bg-[#003355] rounded-md transition duration-150 ease-in-out">
+                <FaBookOpen className="h-5 w-5" />
+                <span>Bookings</span>
+              </Link>
+              <button onClick={handleLogout} className="flex w-full items-center space-x-2 px-4 py-2 text-sm font-medium text-white hover:bg-[#003355] rounded-md transition duration-150 ease-in-out">
+                <FaSignOutAlt className="h-5 w-5" />
+                <span>Logout</span>
               </button>
-              <input
-                ref={fileInputRef}
-                id="fileInput"
-                type="file"
-                accept="image/*"
-                onChange={handleFileInputChange}
-                className="hidden"
-              />
+            </nav>
+          </div>
+          <div className="space-y-6">
+            <div className="bg-white shadow rounded-lg overflow-hidden">
+              <div className="bg-[#002233] h-32"></div>
+              <div className="p-6 -mt-16">
+                <div className="flex flex-col items-center">
+                  <img
+                    src={profile.profilePicture || '/placeholder.svg?height=128&width=128'}
+                    alt="Profile picture"
+                    className="h-32 w-32 rounded-full border-4 border-white object-cover"
+                  />
+                  <h2 className="mt-4 text-2xl font-bold text-[#002233]">{profile.name}</h2>
+                  <p className="text-gray-600">{profile.email}</p>
+                  <button
+                    onClick={() => fileInputRef.current.click()}
+                    className="mt-4 px-4 py-2 bg-[#002233] text-white rounded-md hover:bg-[#003355] transition duration-150 ease-in-out flex items-center"
+                  >
+                    <FaCamera className="mr-2" /> Change Photo
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileInputChange}
+                    className="hidden"
+                  />
+                </div>
+                {isEditing ? (
+                  <form className="mt-6 space-y-4">
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-medium text-[#002233]">Name</label>
+                      <input
+                        id="name"
+                        type="text"
+                        value={updatedProfile.name}
+                        onChange={handleInputChange}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#002233] focus:ring focus:ring-[#002233] focus:ring-opacity-50"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-[#002233]">Email</label>
+                      <input
+                        id="email"
+                        type="email"
+                        value={updatedProfile.email}
+                        onChange={handleInputChange}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#002233] focus:ring focus:ring-[#002233] focus:ring-opacity-50"
+                      />
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => handleSaveChanges()}
+                        className="px-4 py-2 bg-[#002233] text-white rounded-md hover:bg-[#003355] transition duration-150 ease-in-out"
+                      >
+                        Save Changes
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsEditing(false)}
+                        className="px-4 py-2 bg-gray-200 text-[#002233] rounded-md hover:bg-gray-300 transition duration-150 ease-in-out"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="mt-6 space-y-4">
+                    <div className="flex items-center space-x-2 text-[#002233]">
+                      <FaEnvelope className="h-5 w-5" />
+                      <span>{profile.email}</span>
+                    </div>
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="px-4 py-2 bg-[#002233] text-white rounded-md hover:bg-[#003355] transition duration-150 ease-in-out"
+                    >
+                      Edit Profile
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-
-            {/* Editing form */}
-            {isEditing ? (
-              <>
-                <div className="space-y-2">
-                  <label htmlFor="name" className="block text-gray-700">Name</label>
-                  <input
-                    id="name"
-                    value={updatedProfile.name}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border rounded"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="email" className="block text-gray-700">Email</label>
-                  <input
-                    id="email"
-                    value={updatedProfile.email}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border rounded"
-                  />
-                </div>
-                <div className="space-x-2 mt-4">
-                  <button className="px-4 py-2 bg-[#0066FF] text-white rounded" onClick={handleSaveChanges}>Save Changes</button>
-                  <button className="px-4 py-2 bg-gray-300 text-gray-700 rounded" onClick={handleCancel}>Cancel</button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Name:</span>
-                    <span className="font-medium">{profile.name}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Email:</span>
-                    <span className="font-medium">{profile.email}</span>
-                  </div>
-                </div>
-                <div className="mt-4 space-x-2">
-                  <button className="px-4 py-2 bg-[#0066FF] text-white rounded" onClick={handleEditClick}>Edit</button>
-                </div>
-              </>
-            )}
-
-            {/* Reset Password Modal */}
-            {showResetPassword && (
-              <div className="bg-white border rounded p-4 shadow-lg space-y-2">
-                <h3 className="text-lg font-semibold">Reset Password</h3>
-                <div className="space-y-2">
-                  <label htmlFor="currentPassword" className="block text-gray-700">Current Password</label>
-                  <input
-                    id="currentPassword"
-                    type="password"
-                    value={resetPasswordData.currentPassword}
-                    onChange={handleResetPasswordChange}
-                    className="w-full px-3 py-2 border rounded"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="newPassword" className="block text-gray-700">New Password</label>
-                  <input
-                    id="newPassword"
-                    type="password"
-                    value={resetPasswordData.newPassword}
-                    onChange={handleResetPasswordChange}
-                    className="w-full px-3 py-2 border rounded"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="confirmNewPassword" className="block text-gray-700">Confirm New Password</label>
-                  <input
-                    id="confirmNewPassword"
-                    type="password"
-                    value={resetPasswordData.confirmNewPassword}
-                    onChange={handleResetPasswordChange}
-                    className="w-full px-3 py-2 border rounded"
-                  />
-                </div>
-                <div className="space-x-2 mt-4">
-                  <button className="px-4 py-2 bg-[#0066FF] text-white rounded" onClick={handleResetPassword}>Reset Password</button>
-                  <button className="px-4 py-2 bg-gray-300 text-gray-700 rounded" onClick={() => setShowResetPassword(false)}>Cancel</button>
-                </div>
-              </div>
-            )}
-
-            {!showResetPassword && (
-              <div className="mt-4">
-                <button className="px-4 py-2 bg-red-600 text-white rounded" onClick={() => setShowResetPassword(true)}>
-                  Reset Password
-                </button>
-              </div>
-            )}
+            <div className="bg-white shadow rounded-lg p-6">
+              <h2 className="text-xl font-semibold mb-4 text-[#002233]">Security</h2>
+              <button
+                onClick={() => setShowResetPasswordModal(true)}
+                className="px-4 py-2 bg-[#002233] text-white rounded-md hover:bg-[#003355] transition duration-150 ease-in-out flex items-center"
+              >
+                <FaLock className="mr-2" /> Reset Password
+              </button>
+            </div>
           </div>
         </div>
-      </main>
-      <ToastContainer />
-    </div>
+      </div>
+
+      {/* Reset Password Modal */}
+      {showResetPasswordModal && (
+        <div className="fixed inset-0 bg-[#0066FF] bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-4 text-[#002233]">Reset Password</h2>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="currentPassword" className="block text-sm font-medium text-[#002233]">Current Password</label>
+                <input
+                  id="currentPassword"
+                  type="password"
+                  value={resetPasswordData.currentPassword}
+                  onChange={handleResetPasswordChange}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#002233] focus:ring focus:ring-[#002233] focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label htmlFor="newPassword" className="block text-sm font-medium text-[#002233]">New Password</label>
+                <input
+                  id="newPassword"
+                  type="password"
+                  value={resetPasswordData.newPassword}
+                  onChange={handleResetPasswordChange}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#002233] focus:ring focus:ring-[#002233] focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-[#002233]">Confirm New Password</label>
+                <input
+                  id="confirmNewPassword"
+                  type="password"
+                  value={resetPasswordData.confirmNewPassword}
+                  onChange={handleResetPasswordChange}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#002233] focus:ring focus:ring-[#002233] focus:ring-opacity-50"
+                />
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end space-x-2">
+              <button
+                onClick={() => setShowResetPasswordModal(false)}
+                className="px-4 py-2 bg-gray-200 text-[#002233] rounded-md hover:bg-gray-300 transition duration-150 ease-in-out"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleResetPassword}
+                className="px-4 py-2 bg-[#002233] text-white rounded-md hover:bg-[#003355] transition duration-150 ease-in-out"
+              >
+                Reset Password
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

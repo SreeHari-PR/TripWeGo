@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -13,13 +14,11 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post('/api/manager/login', { email, password });
-      console.log('response', response.data)
-      console.log(response.data.data.manager, 'respomse login')
-      console.log(response.data.data.token,'token');
-      
+
       localStorage.setItem('authToken', response.data.data.token);
       localStorage.setItem('managerData', JSON.stringify(response.data.data.manager))
       navigate('/manager/dashboard');
+      toast.success('Welcome back...')
     } catch (error) {
       setError(error.response?.data?.error || 'Login failed');
     }
@@ -80,8 +79,8 @@ const LoginPage = () => {
                   <a href="#!" className="text-blue-600 hover:underline">Forgot password?</a>
                 </div>
                 <div className="flex items-center justify-between pb-6">
-                    <p className="mb-0 mr-2">Don't have an account? <a href='/manager/register'className='text-blue-800  underline' >Register</a></p>
-                  </div>
+                  <p className="mb-0 mr-2">Don't have an account? <a href='/manager/register' className='text-blue-800  underline' >Register</a></p>
+                </div>
 
                 {error && <p className="mt-4 text-center text-red-500">{error}</p>}
               </form>

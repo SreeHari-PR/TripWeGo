@@ -1,6 +1,7 @@
 // src/controllers/adminController.js
 
 const adminService = require('../services/adminService');
+const managerService=require('../services/managerService')
 
 class AdminController {
     async login(req, res) {
@@ -71,6 +72,14 @@ class AdminController {
             res.status(400).send(error.message);
         }
     }
+    async getManagers  (req, res)  {
+        try {
+          const managers = await managerService.getManagersWithHotelCount();
+          res.status(200).json(managers);
+        } catch (error) {
+          res.status(500).json({ message: 'Error fetching managers', error });
+        }
+}
 }
 
 module.exports = new AdminController();

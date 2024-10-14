@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { verifyOtp, resendOtp } from '../../redux/authSlice';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-hot-toast';
 
 const VerifyOtp = () => {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -14,6 +13,7 @@ const VerifyOtp = () => {
     const navigate = useNavigate();
 
     const { loading, verificationStatus, verificationMessage } = useSelector((state) => state.auth);
+
     useEffect(() => {
         const countdown = setInterval(() => {
             setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
@@ -45,12 +45,8 @@ const VerifyOtp = () => {
         e.preventDefault();
         const otpCode = otp.join('');
         await dispatch(verifyOtp({ email, otp: otpCode }));
-
-        if (verificationStatus === 'succeeded') {
-            toast.success('OTP verified successfully!');
-            navigate('/login');
-        }
     };
+
     const handleResendOtp = async () => {
         await dispatch(resendOtp({ email }));
         setOtp(['', '', '', '', '', '']);
@@ -58,10 +54,13 @@ const VerifyOtp = () => {
         toast.success('A new OTP has been sent to your email.');
     };
     useEffect(() => {
-        if (verificationStatus === 'failed') {
+        if (verificationStatus === 'succeeded') {
+            toast.success('OTP verified successfully!');
+            navigate('/users/login');
+        } else if (verificationStatus === 'failed') {
             toast.error(verificationMessage);
         }
-    }, [verificationStatus, verificationMessage]);
+    }, [verificationStatus, verificationMessage, navigate]);
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-gray-100"
@@ -104,7 +103,6 @@ const VerifyOtp = () => {
                     </button>
                 )}
             </div>
-            <ToastContainer />
         </div>
     );
 };

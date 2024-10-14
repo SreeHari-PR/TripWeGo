@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import StickyNavbar from "../../components/User/Navbar";
 import HeroSection from "../../components/User/HeroSection";
 import Carousel from "../../components/User/Carousel";
@@ -13,7 +13,7 @@ export default function Dashboard() {
   const [featuredHotels, setFeaturedHotels] = useState([]);
   const [searchActive, setSearchActive] = useState(false);
 
-   
+
   const totalSlides = 3;
 
   const nextSlide = () => {
@@ -37,16 +37,16 @@ export default function Dashboard() {
 
   const handleSearch = (hotels) => {
     setSearchedHotels(hotels);
-    setSearchActive(true); 
+    setSearchActive(true);
   };
 
 
   return (
     <div>
       <StickyNavbar />
-      <HeroSection onSearch={handleSearch}  />
+      <HeroSection onSearch={handleSearch} />
       
-      <FeaturedHotels hotels={searchActive ? searchedHotels : featuredHotels}   />
+      <FeaturedHotels hotels={searchActive ? searchedHotels : featuredHotels} />
       <Carousel
         currentSlide={currentSlide}
         nextSlide={nextSlide}

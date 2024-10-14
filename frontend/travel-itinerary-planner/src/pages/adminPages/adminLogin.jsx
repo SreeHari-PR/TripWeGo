@@ -1,9 +1,8 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { FaUser, FaLock, FaHotel } from 'react-icons/fa';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { FaUser, FaLock, FaHotel, FaSpinner } from 'react-icons/fa';
+import {  toast } from 'react-hot-toast';
 import api from '../../services/api';
 
 const validationSchema = Yup.object().shape({
@@ -16,36 +15,18 @@ export default function AdminLogin() {
     try {
       const response = await api.post('/admin/login', { email: values.username, password: values.password });
       localStorage.setItem('token', response.data.token);
-      toast.success('Login successful!', {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.success('Login successful!');
       setTimeout(() => {
-        // Navigate to the admin dashboard after login
         window.location.href = '/admin/dashboard';
       }, 2000);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed', {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.error(err.response?.data?.message || 'Login failed');
       setSubmitting(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#002233] p-4">
-      <ToastContainer />
       <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
         <div className="flex items-center justify-center mb-8">
           <FaHotel className="text-6xl text-[#0066FF]" />
@@ -100,7 +81,11 @@ export default function AdminLogin() {
                   disabled={isSubmitting}
                   className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0066FF] hover:bg-[#0055DD] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066FF] transition duration-150 ease-in-out disabled:opacity-50"
                 >
-                  {isSubmitting ? 'Logging in...' : 'Log in'}
+                  {isSubmitting ? (
+                    <FaSpinner className="animate-spin h-5 w-5 text-white" />
+                  ) : (
+                    'Log in'
+                  )}
                 </button>
               </div>
             </Form>

@@ -1,58 +1,72 @@
 import { useState } from 'react';
-import api from '../../services/api';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-hot-toast';
+import api from '../../services/api';
 import uploadImageToCloudinary from '../../utils/cloudinary'; 
-import 'react-toastify/dist/ReactToastify.css';
 
 const RegisterPage = () => {
-  const [managerData, setManagerData] = useState({
-    name: '',
-    email: '',
-    password: '',
-  });
-  const [license, setLicense] = useState(null); 
-  const [kyc, setKyc] = useState(null); 
+  const [license, setLicense] = useState(null);
+  const [kyc, setKyc] = useState(null);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setManagerData({
-      ...managerData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+    validationSchema: Yup.object({
+      name: Yup.string().required('Name is required'),
+      email: Yup.string().email('Invalid email address').required('Email is required'),
+      password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+      license: Yup.mixed()
+        .required('License is required')
+        .test('fileType', 'Only image files are allowed (jpg, jpeg, png)', value => {
+          return value && ['image/jpg', 'image/jpeg', 'image/png'].includes(value.type);
+        }),
+      kyc: Yup.mixed()
+        .required('KYC is required')
+        .test('fileType', 'Only image files are allowed (jpg, jpeg, png)', value => {
+          return value && ['image/jpg', 'image/jpeg', 'image/png'].includes(value.type);
+        }),
+    }),
+    onSubmit: async (values) => {
+      try {
+        const licenseData = await uploadImageToCloudinary(license);
+        const kycData = await uploadImageToCloudinary(kyc);
+
+        const formData = {
+          name: values.name,
+          email: values.email,
+          password: values.password,
+          license: licenseData.url,
+          kyc: kycData.url
+        };
+
+        const response = await api.post('/manager/register', formData);
+        toast.success(response.data.message);
+        navigate('/manager/manager-otp', { state: { email: values.email } });
+      } catch (error) {
+        toast.error(error.response?.data?.error || 'Registration failed');
+        console.log(error);
+        
+      }
+    }
+  });
 
   const handleLicenseChange = (e) => {
-    setLicense(e.target.files[0]);
+    const file = e.target.files[0];
+    setLicense(file);
+    formik.setFieldValue('license', file);
   };
 
   const handleKycChange = (e) => {
-    setKyc(e.target.files[0]);
+    const file = e.target.files[0];
+    setKyc(file);
+    formik.setFieldValue('kyc', file);
   };
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      const licenseData = await uploadImageToCloudinary(license);
-      const kycData = await uploadImageToCloudinary(kyc);
-      const formData = {
-        name: managerData.name,
-        email: managerData.email,
-        password: managerData.password,
-        license: licenseData.url, 
-        kyc: kycData.url 
-      };
-      console.log(formData,'kjkjhj');
-      
-  
-      const response = await api.post('/manager/register', formData);
-      toast.success(response.data.message);
-      navigate('/manager/manager-otp', { state: { email: managerData.email } });
-    } catch (error) {
-      toast.error(error.response?.data?.error || 'Registration failed');
-    }
-  };
-  
 
   return (
     <section
@@ -70,18 +84,21 @@ const RegisterPage = () => {
                 <h4 className="mb-12 mt-1 pb-1 text-xl font-semibold">REGISTER MANAGER</h4>
               </div>
 
-              <form onSubmit={handleRegister}>
+              <form onSubmit={formik.handleSubmit}>
                 <div className="mb-4">
                   <label htmlFor="name" className="block text-gray-700">Your Name</label>
                   <input
                     type="text"
                     name="name"
                     placeholder="Name"
-                    value={managerData.name}
-                    onChange={handleChange}
-                    required
-                    className="mb-4 px-4 py-2 block w-full border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={`mb-4 px-4 py-2 block w-full border rounded-md ${formik.touched.name && formik.errors.name ? 'border-red-500' : ''}`}
                   />
+                  {formik.touched.name && formik.errors.name ? (
+                    <div className="text-red-500 text-sm">{formik.errors.name}</div>
+                  ) : null}
                 </div>
 
                 <div className="mb-4">
@@ -90,11 +107,14 @@ const RegisterPage = () => {
                     type="email"
                     name="email"
                     placeholder="Email"
-                    value={managerData.email}
-                    onChange={handleChange}
-                    required
-                    className="mb-4 px-4 py-2 block w-full border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={`mb-4 px-4 py-2 block w-full border rounded-md ${formik.touched.email && formik.errors.email ? 'border-red-500' : ''}`}
                   />
+                  {formik.touched.email && formik.errors.email ? (
+                    <div className="text-red-500 text-sm">{formik.errors.email}</div>
+                  ) : null}
                 </div>
 
                 <div className="mb-4">
@@ -103,11 +123,14 @@ const RegisterPage = () => {
                     type="password"
                     name="password"
                     placeholder="Password"
-                    value={managerData.password}
-                    onChange={handleChange}
-                    required
-                    className="mb-4 px-4 py-2 block w-full border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={`mb-4 px-4 py-2 block w-full border rounded-md ${formik.touched.password && formik.errors.password ? 'border-red-500' : ''}`}
                   />
+                  {formik.touched.password && formik.errors.password ? (
+                    <div className="text-red-500 text-sm">{formik.errors.password}</div>
+                  ) : null}
                 </div>
 
                 <div className="mb-4">
@@ -116,9 +139,11 @@ const RegisterPage = () => {
                     type="file"
                     name="license"
                     onChange={handleLicenseChange}
-                    required
-                    className="mb-4 px-4 py-2 block w-full border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`mb-4 px-4 py-2 block w-full border rounded-md ${formik.touched.license && formik.errors.license ? 'border-red-500' : ''}`}
                   />
+                  {formik.touched.license && formik.errors.license ? (
+                    <div className="text-red-500 text-sm">{formik.errors.license}</div>
+                  ) : null}
                 </div>
 
                 <div className="mb-4">
@@ -127,9 +152,11 @@ const RegisterPage = () => {
                     type="file"
                     name="kyc"
                     onChange={handleKycChange}
-                    required
-                    className="mb-4 px-4 py-2 block w-full border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`mb-4 px-4 py-2 block w-full border rounded-md ${formik.touched.kyc && formik.errors.kyc ? 'border-red-500' : ''}`}
                   />
+                  {formik.touched.kyc && formik.errors.kyc ? (
+                    <div className="text-red-500 text-sm">{formik.errors.kyc}</div>
+                  ) : null}
                 </div>
 
                 <div className="mb-12 text-center">
@@ -145,16 +172,11 @@ const RegisterPage = () => {
 
               <div className="flex items-center justify-between pb-6">
                 <p className="mb-0 mr-2">Already have an account?  <a href='/manager/login'className='text-blue-800  underline' >Login</a> </p>
-                
-                
-               
-  
               </div>
             </div>
           </div>
         </div>
       </div>
-      <ToastContainer />
     </section>
   );
 };
