@@ -12,7 +12,8 @@ export default function Dashboard() {
   const [searchedHotels, setSearchedHotels] = useState([]);
   const [featuredHotels, setFeaturedHotels] = useState([]);
   const [searchActive, setSearchActive] = useState(false);
-
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
+  const [locationError, setLocationError] = useState(null);
 
   const totalSlides = 3;
 
@@ -23,6 +24,7 @@ export default function Dashboard() {
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
   };
+
   useEffect(() => {
     const fetchFeaturedHotels = async () => {
       try {
@@ -40,12 +42,44 @@ export default function Dashboard() {
     setSearchActive(true);
   };
 
+  // Fetch user's location on component mount
+  useEffect(() => {
+    const fetchLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setLocation({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
+          },
+          (error) => {
+            setLocationError(error.message);
+          }
+        );
+      } else {
+        setLocationError('Geolocation is not supported by this browser.');
+      }
+    };
+
+    fetchLocation();
+  }, []);
 
   return (
     <div>
       <StickyNavbar />
-      <HeroSection onSearch={handleSearch} />
+      <HeroSection onSearch={handleSearch} location={location} />
       
+      {locationError ? (
+        <p className="text-red-500 text-center mt-4">{locationError}</p>
+      ) : location.latitude && location.longitude ? (
+        <p className="text-center mt-4">
+          Current Location - Latitude: {location.latitude}, Longitude: {location.longitude}
+        </p>
+      ) : (
+        <p className="text-center mt-4">Loading location...</p>
+      )}
+
       <FeaturedHotels hotels={searchActive ? searchedHotels : featuredHotels} />
       <Carousel
         currentSlide={currentSlide}

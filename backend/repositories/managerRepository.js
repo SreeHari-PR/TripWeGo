@@ -1,5 +1,6 @@
 // src/repositories/managerRepository.js
 const { Manager } = require('../models/managerModel')
+const Transaction=require('../models/transactionModel')
 
 class ManagerRepository {
     async createManager(managerData) {
@@ -54,6 +55,26 @@ class ManagerRepository {
           },
         ]);
       }
+
+      async getWalletAndTransactions(managerId) {
+        try {
+            const manager = await Manager.findById(managerId, 'walletBalance');
+            if (!manager) {
+                throw new Error('Manager not found');
+            }
+            const transactions = await Transaction.find({ managerId })
+                .sort({ date: -1 })
+                .select('amount type date description');
+            
+            return {
+                walletBalance: manager.walletBalance,
+                transactions
+            };
+        } catch (error) {
+            console.error('Error retrieving wallet and transactions:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = new ManagerRepository();

@@ -2,6 +2,7 @@
 
 const userRepository = require('../repositories/userRepository');
 const managerRepository=require('../repositories/managerRepository')
+const walletRepository=require('../repositories/walletRepository')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -61,6 +62,19 @@ class AdminService {
         user.isBlocked = false;
         await user.save();
         return user;
+    }
+    async getAdminWalletDetails() {
+        // Fetch wallet details and transactions for the admin user from repository
+        const admin = await walletRepository.getAdminWalletAndTransactions();
+        
+        if (!admin) {
+            throw new Error('Admin not found');
+        }
+
+        return {
+            walletBalance: admin.walletBalance,
+            transactions: admin.transactions
+        };
     }
 }
 

@@ -4,6 +4,7 @@ const { findManagerById, findManagerByEmail, createManager,updateManager } = req
 const {  validateManager } = require('../models/managerModel');
 const sendEmail = require('../utils/sendEmail');
 const generateOtp = require('../utils/generateOtp');
+const managerRepository=require('../repositories/managerRepository')
 const pendingManagers = new Map();
 
 
@@ -141,6 +142,15 @@ class ManagerService {
       async getManagersWithHotelCount() {
         return managerRepository.getManagersWithHotelCount();
       }
+
+      async getManagerWalletAndTransactions(managerId) {
+        try {
+            const data = await managerRepository.getWalletAndTransactions(managerId);
+            return data;
+        } catch (error) {
+            throw new Error(`Error retrieving wallet and transactions: ${error.message}`);
+        }
+    }
 }
 
 module.exports = ManagerService;

@@ -3,7 +3,10 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const { googleLoginController } = require('../controllers/authController');
+const paymentcontroller=require('../controllers/paymentController')
 const hotelController = require('../controllers/hotelController');
+const bookingController = require('../controllers/bookingController');
+const walletController=require('../controllers/walletController')
 const {profilePictureUpload} = require('../middlewares/multer');
 
 
@@ -28,6 +31,23 @@ router.post('/upload-profile-picture', authMiddleware, profilePictureUpload, use
 router.get('/hotels', hotelController.listAllHotels);
 router.get('/search', hotelController.searchHotels);
 router.get('/hotels/:id', hotelController.getHotel);
+
+//bookings
+
+
+router.post('/create-order', paymentcontroller.createOrder);
+
+
+router.post('/verify-payment',authMiddleware, paymentcontroller.verifyPayment);
+
+router.get('/bookings', authMiddleware, bookingController.listUserBookings);
+router.delete('/bookings/:bookingId/cancel', authMiddleware, bookingController.cancelBooking);
+
+
+// Routes for wallet operations
+router.get('/wallet/balance', authMiddleware, walletController.getBalance);
+router.post('/wallet/add-funds', authMiddleware, walletController.addFunds);
+router.post('/wallet/deduct-funds', authMiddleware, walletController.deductFunds);
 
 
 module.exports = router;

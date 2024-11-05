@@ -1,53 +1,45 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { FaHome, FaUser, FaBookOpen, FaSignOutAlt, FaCamera, FaEnvelope, FaLock } from 'react-icons/fa';
-import { toast } from 'react-hot-toast';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../services/api';
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Camera, Edit2, Key, LogOut } from 'lucide-react';
+import api from '../../services/api';
 import { logout } from '../../redux/authSlice';
-import StickyNavbar from '../../components/User/Navbar';
 import uploadImageToCloudinary from '../../utils/cloudinary';
+import toast from 'react-hot-toast';
+import Navigation from '../../components/User/Navigation';
+import StickyNavbar from '../../components/User/Navbar';
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [updatedProfile, setUpdatedProfile] = useState({
+  const [profile, setProfile] = useState({
     name: '',
     email: '',
+    profilePicture: '/placeholder.svg?height=128&width=128'
   });
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
-  const [resetPasswordData, setResetPasswordData] = useState({
+  const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile');
+  const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
-    confirmNewPassword: '',
+    confirmPassword: ''
   });
+  const [loading, setLoading] = useState(true);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    dispatch(logout());
-    setTimeout(() => {
-      navigate('/login');
-    }, 1500);
-  };
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await api.get('/users/profile', {
         headers: {
-          Authorization: ` ${token}`,
+          Authorization: `${token}`,
         },
       });
       setProfile(response.data);
-      setUpdatedProfile({
-        name: response.data.name,
-        email: response.data.email,
-      });
       setLoading(false);
     } catch (error) {
       toast.error('Failed to load profile');
@@ -58,16 +50,56 @@ export default function ProfilePage() {
     }
   };
 
-  useEffect(() => {
-    fetchProfile();
-  }, [navigate]);
-
   const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setUpdatedProfile({
-      ...updatedProfile,
-      [id]: value,
-    });
+    setProfile({ ...profile, [e.target.id]: e.target.value });
+  };
+
+  const handlePasswordChange = (e) => {
+    setPasswordData({ ...passwordData, [e.target.id]: e.target.value });
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await api.put('/users/profile', profile, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+      toast.success('Profile updated successfully');
+      setIsEditing(false);
+    } catch (error) {
+      toast.error('Failed to update profile');
+      console.error('Error updating profile:', error);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    try {
+      const { currentPassword, newPassword, confirmPassword } = passwordData;
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        toast.error('All fields are required');
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        toast.error('New passwords do not match');
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+      await api.post('/users/resetpassword', { currentPassword, newPassword }, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+
+      toast.success('Password changed successfully');
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      toast.error('Failed to change password');
+    }
   };
 
   const handleFileInputChange = async (event) => {
@@ -76,8 +108,9 @@ export default function ProfilePage() {
       try {
         const data = await uploadImageToCloudinary(file);
         if (data?.url) {
-          setSelectedFile(data.url);
-          handleSaveChanges(data.url);
+          const updatedProfile = { ...profile, profilePicture: data.url };
+          setProfile(updatedProfile);
+          handleSaveChanges();
         } else {
           toast.error('Image upload failed');
         }
@@ -87,243 +120,185 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSaveChanges = async (imageUrl) => {
-    try {
-      const token = localStorage.getItem('token');
-      const updatedProfileWithImage = {
-        ...updatedProfile,
-        profilePicture: imageUrl || profile.profilePicture,
-      };
-
-      await api.put('/users/profile', updatedProfileWithImage, {
-        headers: {
-          Authorization: ` ${token}`,
-        },
-      });
-      setProfile(updatedProfileWithImage);
-      toast.success('Profile updated successfully');
-      setIsEditing(false);
-    } catch (error) {
-      toast.error('Failed to update profile');
-      console.error('Error updating profile:', error);
-    }
+  const handleLogout = () => {
+    dispatch(logout());
+    setTimeout(() => {
+      navigate('/login');
+    }, 1500);
   };
 
-  const handleResetPasswordChange = (e) => {
-    const { id, value } = e.target;
-    setResetPasswordData({
-      ...resetPasswordData,
-      [id]: value,
-    });
-  };
-
-  const handleResetPassword = async () => {
-    try {
-      const { currentPassword, newPassword, confirmNewPassword } = resetPasswordData;
-
-      if (!currentPassword || !newPassword || !confirmNewPassword) {
-        toast.error('All fields are required');
-        return;
-      }
-
-      if (newPassword !== confirmNewPassword) {
-        toast.error('New passwords do not match');
-        return;
-      }
-
-      const token = localStorage.getItem('token');
-      await api.post('/users/resetpassword', { currentPassword, newPassword }, {
-        headers: {
-          Authorization: ` ${token}`,
-        },
-      });
-
-      toast.success('Password reset successfully');
-      setResetPasswordData({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
-      setShowResetPasswordModal(false);
-    } catch (error) {
-      toast.error('Failed to reset password');
-    }
-  };
-
-  if (loading) return <div className="flex justify-center items-center h-screen bg-[#0066FF] text-white">Loading...</div>;
-
-  if (!profile) return <div className="flex justify-center items-center h-screen bg-[#0066FF] text-white">No profile data</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-screen bg-gradient-to-br from-[#CADCFC] to-[#00246B]">
+      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-[#00246B]"></div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-[#CADCFC] to-[#00246B]">
       <StickyNavbar />
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-6">
-          <div className="bg-[#002233] shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4 text-white">Navigation</h2>
-            <nav className="space-y-2">
-              <Link to="/" className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white hover:bg-[#003355] rounded-md transition duration-150 ease-in-out">
-                <FaHome className="h-5 w-5" />
-                <span>Home</span>
-              </Link>
-              <Link to="/profile" className="flex items-center space-x-2 px-4 py-2 text-sm font-medium bg-[#003355] text-white rounded-md">
-                <FaUser className="h-5 w-5" />
-                <span>Profile</span>
-              </Link>
-              <Link to="/bookings" className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white hover:bg-[#003355] rounded-md transition duration-150 ease-in-out">
-                <FaBookOpen className="h-5 w-5" />
-                <span>Bookings</span>
-              </Link>
-              <button onClick={handleLogout} className="flex w-full items-center space-x-2 px-4 py-2 text-sm font-medium text-white hover:bg-[#003355] rounded-md transition duration-150 ease-in-out">
-                <FaSignOutAlt className="h-5 w-5" />
-                <span>Logout</span>
-              </button>
-            </nav>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="md:col-span-1">
+            <Navigation onLogout={handleLogout} />
           </div>
-          <div className="space-y-6">
-            <div className="bg-white shadow rounded-lg overflow-hidden">
-              <div className="bg-[#002233] h-32"></div>
-              <div className="p-6 -mt-16">
-                <div className="flex flex-col items-center">
-                  <img
-                    src={profile.profilePicture || '/placeholder.svg?height=128&width=128'}
-                    alt="Profile picture"
-                    className="h-32 w-32 rounded-full border-4 border-white object-cover"
-                  />
-                  <h2 className="mt-4 text-2xl font-bold text-[#002233]">{profile.name}</h2>
-                  <p className="text-gray-600">{profile.email}</p>
-                  <button
-                    onClick={() => fileInputRef.current.click()}
-                    className="mt-4 px-4 py-2 bg-[#002233] text-white rounded-md hover:bg-[#003355] transition duration-150 ease-in-out flex items-center"
-                  >
-                    <FaCamera className="mr-2" /> Change Photo
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileInputChange}
-                    className="hidden"
-                  />
+          <div className="md:col-span-3">
+            <div className="bg-[#CADCFC] rounded-lg shadow-xl overflow-hidden">
+              <div className="p-8">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="relative">
+                    <img
+                      src={profile.profilePicture}
+                      alt="Profile"
+                      className="h-32 w-32 rounded-full object-cover border-4 border-[#00246B]"
+                    />
+                    <button 
+                      className="absolute bottom-0 right-0 bg-[#00246B] text-white p-2 rounded-full hover:bg-[#CADCFC] transition duration-300"
+                      onClick={() => fileInputRef.current.click()}
+                    >
+                      <Camera className="h-5 w-5" />
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileInputChange}
+                      className="hidden"
+                    />
+                  </div>
+                  <h1 className="text-3xl font-bold text-[#00246B]">{profile.name}</h1>
+                  <p className="text-[#00246B]">{profile.email}</p>
                 </div>
-                {isEditing ? (
-                  <form className="mt-6 space-y-4">
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-[#002233]">Name</label>
-                      <input
-                        id="name"
-                        type="text"
-                        value={updatedProfile.name}
-                        onChange={handleInputChange}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#002233] focus:ring focus:ring-[#002233] focus:ring-opacity-50"
-                      />
+              </div>
+              
+              <div className="border-b border-[#00246B]">
+                <nav className="flex">
+                  {['profile', 'security'].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`flex-1 py-4 px-1 text-center font-medium text-sm ${
+                        activeTab === tab
+                          ? 'border-b-2 border-[#00246B] text-[#00246B]'
+                          : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      }`}
+                    >
+                      {tab === 'profile' ? (
+                        <div className="flex items-center justify-center">
+                          <Edit2 className="h-5 w-5 mr-2" />
+                          Profile
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center">
+                          <Key className="h-5 w-5 mr-2" />
+                          Security
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+
+              <div className="p-8">
+                {activeTab === 'profile' && (
+                  <div className="space-y-6">
+                    <h2 className="text-2xl font-semibold text-[#00246B]">Profile Information</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label htmlFor="name" className="block text-sm font-medium text-[#00246B]">Name</label>
+                        <input
+                          id="name"
+                          type="text"
+                          value={profile.name}
+                          onChange={handleInputChange}
+                          disabled={!isEditing}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-[#00246B]">Email</label>
+                        <input
+                          id="email"
+                          type="email"
+                          value={profile.email}
+                          onChange={handleInputChange}
+                          disabled={!isEditing}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-[#002233]">Email</label>
-                      <input
-                        id="email"
-                        type="email"
-                        value={updatedProfile.email}
-                        onChange={handleInputChange}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#002233] focus:ring focus:ring-[#002233] focus:ring-opacity-50"
-                      />
-                    </div>
-                    <div className="flex space-x-2">
+                    {isEditing ? (
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={handleSaveChanges}
+                          className="px-4 py-2 bg-[#00246B] text-white rounded-md hover:bg-[#CADCFC] focus:outline-none focus:ring-2 focus:ring-[#00246B] focus:ring-offset-2 transition duration-300"
+                        >
+                          Save Changes
+                        </button>
+                        <button
+                          onClick={() => setIsEditing(false)}
+                          className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-300"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
                       <button
-                        type="button"
-                        onClick={() => handleSaveChanges()}
-                        className="px-4 py-2 bg-[#002233] text-white rounded-md hover:bg-[#003355] transition duration-150 ease-in-out"
+                        onClick={() => setIsEditing(true)}
+                        className="px-4 py-2 bg-[#00246B] text-white rounded-md hover:bg-[#CADCFC] focus:outline-none focus:ring-2 focus:ring-[#00246B] focus:ring-offset-2 transition duration-300"
                       >
-                        Save Changes
+                        Edit Profile
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => setIsEditing(false)}
-                        className="px-4 py-2 bg-gray-200 text-[#002233] rounded-md hover:bg-gray-300 transition duration-150 ease-in-out"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="mt-6 space-y-4">
-                    <div className="flex items-center space-x-2 text-[#002233]">
-                      <FaEnvelope className="h-5 w-5" />
-                      <span>{profile.email}</span>
+                    )}
+                  </div>
+                )}
+                {activeTab === 'security' && (
+                  <div className="space-y-6">
+                    <h2 className="text-2xl font-semibold text-[#00246B]">Change Password</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label htmlFor="currentPassword" className="block text-sm font-medium text-[#00246B]">Current Password</label>
+                        <input
+                          id="currentPassword"
+                          type="password"
+                          value={passwordData.currentPassword}
+                          onChange={handlePasswordChange}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="newPassword" className="block text-sm font-medium text-[#00246B]">New Password</label>
+                        <input
+                          id="newPassword"
+                          type="password"
+                          value={passwordData.newPassword}
+                          onChange={handlePasswordChange}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#00246B]">Confirm New Password</label>
+                        <input
+                          id="confirmPassword"
+                          type="password"
+                          value={passwordData.confirmPassword}
+                          onChange={handlePasswordChange}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
+                        />
+                      </div>
                     </div>
                     <button
-                      onClick={() => setIsEditing(true)}
-                      className="px-4 py-2 bg-[#002233] text-white rounded-md hover:bg-[#003355] transition duration-150 ease-in-out"
+                      onClick={handleChangePassword}
+                      className="px-4 py-2 bg-[#00246B] text-white rounded-md hover:bg-[#CADCFC] focus:outline-none focus:ring-2 focus:ring-[#00246B] focus:ring-offset-2 transition duration-300"
                     >
-                      Edit Profile
+                      Change Password
                     </button>
                   </div>
                 )}
               </div>
             </div>
-            <div className="bg-white shadow rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4 text-[#002233]">Security</h2>
-              <button
-                onClick={() => setShowResetPasswordModal(true)}
-                className="px-4 py-2 bg-[#002233] text-white rounded-md hover:bg-[#003355] transition duration-150 ease-in-out flex items-center"
-              >
-                <FaLock className="mr-2" /> Reset Password
-              </button>
-            </div>
           </div>
         </div>
       </div>
-
-      {/* Reset Password Modal */}
-      {showResetPasswordModal && (
-        <div className="fixed inset-0 bg-[#0066FF] bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
-          <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4 text-[#002233]">Reset Password</h2>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="currentPassword" className="block text-sm font-medium text-[#002233]">Current Password</label>
-                <input
-                  id="currentPassword"
-                  type="password"
-                  value={resetPasswordData.currentPassword}
-                  onChange={handleResetPasswordChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#002233] focus:ring focus:ring-[#002233] focus:ring-opacity-50"
-                />
-              </div>
-              <div>
-                <label htmlFor="newPassword" className="block text-sm font-medium text-[#002233]">New Password</label>
-                <input
-                  id="newPassword"
-                  type="password"
-                  value={resetPasswordData.newPassword}
-                  onChange={handleResetPasswordChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#002233] focus:ring focus:ring-[#002233] focus:ring-opacity-50"
-                />
-              </div>
-              <div>
-                <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-[#002233]">Confirm New Password</label>
-                <input
-                  id="confirmNewPassword"
-                  type="password"
-                  value={resetPasswordData.confirmNewPassword}
-                  onChange={handleResetPasswordChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#002233] focus:ring focus:ring-[#002233] focus:ring-opacity-50"
-                />
-              </div>
-            </div>
-            <div className="mt-6 flex justify-end space-x-2">
-              <button
-                onClick={() => setShowResetPasswordModal(false)}
-                className="px-4 py-2 bg-gray-200 text-[#002233] rounded-md hover:bg-gray-300 transition duration-150 ease-in-out"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleResetPassword}
-                className="px-4 py-2 bg-[#002233] text-white rounded-md hover:bg-[#003355] transition duration-150 ease-in-out"
-              >
-                Reset Password
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

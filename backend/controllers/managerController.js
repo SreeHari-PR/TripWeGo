@@ -133,6 +133,18 @@ class ManagerController {
               res.status(500).json({ success: false, message: 'Server error', error: error.message });
             }
           };
+          async getManagerWalletAndTransactions(req, res) {
+            console.log('hsjkdfh');
+            
+            try {
+                const { managerId } = req.params;
+                console.log(req.params,'id')
+                const data = await managerService.getManagerWalletAndTransactions(managerId);
+                res.status(200).json({ success: true, data });
+            } catch (error) {
+                res.status(500).json({ success: false, message: error.message });
+            }
+        }
 }
 
 module.exports = new ManagerController();

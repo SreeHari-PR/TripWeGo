@@ -67,22 +67,24 @@ class HotelController {
             }
           }
           async searchHotels(req, res) {
-            console.log('gsjhdgfj');
-            
-            const { location } = req.query;
-            console.log(req.query,'location')
+            const { searchTerm, checkInDate, checkOutDate, guestCount } = req.query;
         
             try {
-              const hotels = await hotelService.searchHotels(location);
-              console.log(hotels,'searched');
-              
-              return res.status(200).json(hotels);
+                const hotels = await hotelService.searchHotels({
+                    searchTerm: searchTerm || undefined,
+                    checkInDate: checkInDate || undefined,
+                    checkOutDate: checkOutDate || undefined,
+                    guestCount: guestCount ? parseInt(guestCount, 10) : undefined
+                });
+                return res.status(200).json(hotels);
             } catch (error) {
-              return res.status(500).json({ error: error.message });
+                return res.status(500).json({ error: error.message });
             }
-          }
+        }
           async getHotel(req, res) {
             const hotelId = req.params.id;
+            console.log(hotelId);
+            
     
             try {
                 const hotel = await hotelService.getSingleHotelPage(hotelId);
@@ -101,6 +103,64 @@ class HotelController {
                     message: error.message
                 });
             }
+        }
+        async editHotel(req, res) {
+          try {
+            console.log('working.');
+            
+            const hotelId = req.params.id;
+            const hotelData = req.body;
+            const updatedHotel = await hotelService.editHotel(hotelId, hotelData);
+      
+            return res.status(200).json({
+              success: true,
+              message: 'Hotel updated successfully',
+              hotel: updatedHotel
+            });
+          } catch (error) {
+            return res.status(400).json({
+              success: false,
+              message: error.message
+            });
+          }
+        }
+      
+        // List a hotel (make it publicly available)
+        async listHotel(req, res) {
+          try {
+            const hotelId = req.params.id;
+            const listedHotel = await hotelService.updateListingStatus(hotelId, true);
+      
+            return res.status(200).json({
+              success: true,
+              message: 'Hotel listed successfully',
+              hotel: listedHotel
+            });
+          } catch (error) {
+            return res.status(400).json({
+              success: false,
+              message: error.message
+            });
+          }
+        }
+      
+        // Unlist a hotel (hide it from public)
+        async unlistHotel(req, res) {
+          try {
+            const hotelId = req.params.id;
+            const unlistedHotel = await hotelService.updateListingStatus(hotelId, false);
+      
+            return res.status(200).json({
+              success: true,
+              message: 'Hotel unlisted successfully',
+              hotel: unlistedHotel
+            });
+          } catch (error) {
+            return res.status(400).json({
+              success: false,
+              message: error.message
+            });
+          }
         }
           
 

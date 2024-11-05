@@ -21,6 +21,8 @@ router.post('/managers/:id/approve', adminController.approveManager);
 router.post('/users/:id/block', adminController.blockUser);
 router.post('/users/:id/unblock', adminController.unblockUser);
 
+router.get('/wallet-transactions',adminController.getAdminWallet);
+
 //category controller
 
 router.post('/add-category', categoryController.addCategory);

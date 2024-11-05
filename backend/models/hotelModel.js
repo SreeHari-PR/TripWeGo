@@ -66,18 +66,23 @@ const hotelSchema = new mongoose.Schema({
         type: Number,
         required: true,
       },
+      maxGuests: {     
+        type: Number,
+        required: true,
+        min: 1,        
+      },
     },
   ],
   services: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Service', // Reference to a Service model
+      ref: 'Service',
       required: false,
     },
   ],
   category: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category', // Reference to a Category model
+    ref: 'Category',
     required: true,
   },
   rating: {
@@ -90,7 +95,7 @@ const hotelSchema = new mongoose.Schema({
     {
       userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Reference to a User model for reviewer
+        ref: 'User', 
       },
       comment: {
         type: String,
@@ -118,7 +123,7 @@ const hotelSchema = new mongoose.Schema({
   },
   managerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Manager', // Reference to Manager model
+    ref: 'Manager', 
     required: true,
   },
   openingDate: {
@@ -128,6 +133,10 @@ const hotelSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  isListed: {
+    type: Boolean,
+    default: true, 
   },
 });
 

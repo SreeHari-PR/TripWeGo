@@ -35,9 +35,23 @@ const VerifyOtp = () => {
 
         const newOtp = [...otp];
         newOtp[index] = value;
-        setOtp(newOtp);
+
+        // Move to the next input if a number is entered
         if (value !== '' && index < otp.length - 1) {
             document.getElementById(`otp-input-${index + 1}`).focus();
+        }
+
+        // Move to the previous input on backspace
+        if (value === '' && index > 0) {
+            document.getElementById(`otp-input-${index - 1}`).focus();
+        }
+
+        setOtp(newOtp);
+    };
+
+    const handleKeyDown = (e, index) => {
+        if (e.key === 'Backspace' && otp[index] === '' && index > 0) {
+            document.getElementById(`otp-input-${index - 1}`).focus();
         }
     };
 
@@ -53,6 +67,7 @@ const VerifyOtp = () => {
         setTimer(60);
         toast.success('A new OTP has been sent to your email.');
     };
+
     useEffect(() => {
         if (verificationStatus === 'succeeded') {
             toast.success('OTP verified successfully!');
@@ -77,6 +92,7 @@ const VerifyOtp = () => {
                                 type="text"
                                 value={digit}
                                 onChange={(e) => handleChange(e.target.value, index)}
+                                onKeyDown={(e) => handleKeyDown(e, index)}
                                 className="w-10 px-2 py-2 text-center border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 maxLength="1"
                                 required

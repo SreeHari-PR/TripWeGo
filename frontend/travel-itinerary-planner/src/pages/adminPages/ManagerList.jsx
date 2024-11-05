@@ -79,15 +79,11 @@ export default function AdminManagerList() {
     if (confirmResult.isConfirmed) {
       try {
         await api.post(`/admin/managers/${action}`, {
-          managerId // Send managerId in the request body
+          managerId 
         });
   
         Swal.fire('Success', `Manager ${action}ed successfully.`, 'success');
-        
-        // Fetch the updated manager list
-        fetchManagers();
-        
-        // Update selectedManager state if it's the currently viewed manager
+         fetchManagers();
         if (selectedManager && selectedManager._id === managerId) {
           setSelectedManager({
             ...selectedManager,

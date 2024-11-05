@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FaHotel, FaBars, FaTimes, FaUser, FaSearch, FaHeart, FaSuitcase } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaHotel, FaBars, FaTimes, FaUser, FaHeart, FaSuitcase } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -8,8 +8,6 @@ const StickyNavbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const user = useSelector((state) => state.auth.user);
-  console.log(user,'user');
-  
   
   const navigate = useNavigate();
 
@@ -21,13 +19,18 @@ const StickyNavbar = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  useEffect(() => {
+    if (isLoggedIn && user?.isBlocked) {
+      navigate('/login', { state: { message: 'Your account has been blocked. Please contact support.' } });
+    }
+  }, [isLoggedIn, user?.isBlocked, navigate]);
+
   return (
-    <nav className="bg-[#002233] shadow-lg">
+    <nav className="bg-[#00246B] shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <FaHotel className="h-8 w-8 text-[#0066FF]" />
               <span className="ml-2 text-xl font-bold text-white">Trip We Go</span>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -37,11 +40,8 @@ const StickyNavbar = () => {
               <Link to="/hotels" className="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                 Hotels
               </Link>
-              <Link to="/destinations" className="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                Destinations
-              </Link>
-              <Link to="/deals" className="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                Deals
+              <Link to="/manager/login" className="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                Manager
               </Link>
             </div>
           </div>
@@ -70,14 +70,7 @@ const StickyNavbar = () => {
                 <span className="sr-only">Open user menu</span>
                 <FaUser className="h-8 w-8 rounded-full p-1 text-white" />
               </button>
-
-              {/* {isLoggedIn && (
-                <div className="ml-3 float-left">
-                  <span className="text-base font-medium text-white">{user?.name}</span>
-                </div>
-              )} */}
             </div>
-
 
             {isDropdownOpen && isLoggedIn && (
               <div className="absolute top-20 w-48 bg-white rounded-md shadow-lg z-20">
@@ -93,9 +86,6 @@ const StickyNavbar = () => {
                     <Link to="/settings" className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-[#003344]">
                       Settings
                     </Link>
-                    <button onClick={() => navigate('/signout')} className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-[#003344]">
-                      Sign out
-                    </button>
                   </div>
                 </div>
               </div>
@@ -151,14 +141,11 @@ const StickyNavbar = () => {
               {isLoggedIn ? (
                 <>
                   <Link to="/profile" className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-[#003344]">
-                    Your Profile
+                    My Profile
                   </Link>
                   <Link to="/settings" className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-[#003344]">
                     Settings
                   </Link>
-                  <button onClick={() => navigate('/signout')} className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-[#003344]">
-                    Sign out
-                  </button>
                 </>
               ) : (
                 <Link to="/login" className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-[#003344]">

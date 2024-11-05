@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const managerController = require('../controllers/managerController');
+const bookingController=require('../controllers/bookingController')
 const hotelController=require('../controllers/hotelController')
-const managerAuth = require('../middlewares/managerAuth'); 
 const authMiddleware=require('../middlewares/adminMiddleware')
-const {multipleUpload} = require('../middlewares/multer');
+
 
 
 router.post('/register', managerController.registerManager);
@@ -20,6 +20,14 @@ router.put('/edit-profile', managerController.editManagerProfile);
 //hotels
 router.post('/add-hotel/:id', hotelController.addHotel);
 router.get('/hotels', hotelController.listHotelsByManager);
+router.get('/hotels/:id', hotelController.getHotel);
+router.put('/hotels/edit/:id', hotelController.editHotel); 
+router.put('/hotels/:id/list', hotelController.listHotel); 
+router.put('/hotels/:id/unlist', hotelController.unlistHotel);
+
+router.get('/bookings/:managerId',bookingController.listManagerBookings);
+
+router.get('/wallet-transactions/:managerId', managerController.getManagerWalletAndTransactions);
 
 
 module.exports = router;

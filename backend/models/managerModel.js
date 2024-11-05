@@ -41,6 +41,11 @@ const managerSchema = new mongoose.Schema({
          type: Boolean, 
          default: false 
         },
+    walletBalance: { 
+            type: Number, 
+            default: 0 
+        },
+        hotelId: { type: mongoose.Schema.Types.ObjectId, ref: 'Hotel' },
 }, {
     timestamps: true
 });

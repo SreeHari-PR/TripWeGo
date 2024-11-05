@@ -14,30 +14,48 @@ class HotelRepository {
   }
   async getAllHotels() {
     try {
-      const hotels = await Hotel.find();
+      const hotels = await Hotel.find({isListed: true});
       return hotels;
     } catch (error) {
       throw new Error('Error fetching hotels: ' + error.message);
     }
   }
-  async findByLocation(location) {
-    try {
-      const regex = new RegExp(location, 'i'); // Create a case-insensitive regex
-
-      const hotels = await Hotel.find({
-        $or: [
-          { 'location.address': regex },
-          { 'location.city': regex },
-          { 'location.state': regex },
-          { 'location.country': regex },
-        ],
-      });
-      return hotels;
-
-    } catch (error) {
-      throw new Error('Error finding hotels by location');
+  async findHotelsByFilters({ searchTerm, checkInDate, checkOutDate, guestCount }) {
+    const query = {};
+    if (searchTerm) {
+        const regex = new RegExp(searchTerm, 'i');
+        query.$or = [
+            { 'location.address': regex },
+            { 'location.city': regex },
+            { 'location.state': regex },
+            { 'location.country': regex },
+            { name: regex }
+        ];
     }
+    if (checkInDate && checkOutDate) {
+        query.$and = [
+            { checkInTime: { $lte: checkInDate } },
+            { checkOutTime: { $gte: checkOutDate } }
+        ];
+    }
+    if (guestCount) {
+        const guestCountNumber = parseInt(guestCount, 10);  
+        if (!isNaN(guestCountNumber)) {
+            query.roomTypes = { 
+                $elemMatch: { maxGuests: { $gte: guestCountNumber } }
+            };
+        }
+
+    try {
+        const hotels = await Hotel.find(query);
+        return hotels;
+    } catch (error) {
+        throw new Error('Error finding hotels with specified filters');
+    }
+}
+
   }
+
   async getHotelById(hotelId) {
 
     try {
@@ -52,6 +70,29 @@ class HotelRepository {
   }
   async countByManagerId(managerId) {
     return Hotel.countDocuments({ managerId });
+  }
+  async updateHotel(hotelId, hotelData) {
+    try {
+      const updatedHotel = await Hotel.findByIdAndUpdate(hotelId, hotelData, { new: true }).populate('category services');
+      if (!updatedHotel) {
+        throw new Error('Hotel not found');
+      }
+      return updatedHotel;
+    } catch (error) {
+      throw new Error('Error updating hotel: ' + error.message);
+    }
+  }
+
+  async updateListingStatus(hotelId, isListed) {
+    try {
+      const updatedHotel = await Hotel.findByIdAndUpdate(hotelId, { isListed }, { new: true });
+      if (!updatedHotel) {
+        throw new Error('Hotel not found');
+      }
+      return updatedHotel;
+    } catch (error) {
+      throw new Error('Error updating hotel listing status: ' + error.message);
+    }
   }
 
 }

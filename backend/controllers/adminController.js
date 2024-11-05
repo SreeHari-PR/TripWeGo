@@ -80,6 +80,15 @@ class AdminController {
           res.status(500).json({ message: 'Error fetching managers', error });
         }
 }
+   async getAdminWallet  (req, res)  {
+    try {
+        const walletDetails = await adminService.getAdminWalletDetails();
+        res.json({ data: walletDetails });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ message: 'Error retrieving admin wallet and transactions' });
+    }
+}
 }
 
 module.exports = new AdminController();

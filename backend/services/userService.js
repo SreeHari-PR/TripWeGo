@@ -72,20 +72,29 @@ const resendOtp = async (email) => {
 
 const loginUser = async (email, password) => {
     const user = await findUserByEmail(email);
-    console.log(user,'user')
+    console.log(user, 'user');
+
     if (!user) {
         throw new Error('Invalid email or password');
     }
 
+    
+    if (user.isBlocked===true) {
+        throw new Error('Your account has been blocked. Please contact support.');
+    }
+
+   
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
         throw new Error('Invalid email or password');
     }
 
+    
     if (!user.verified) {
         throw new Error('Your email is not verified. Please verify your email using the OTP sent to you.');
     }
 
+    
     const token = user.generateAuthToken();
     return { 
         token,
@@ -99,6 +108,7 @@ const loginUser = async (email, password) => {
         }
     };
 };
+
 
 
 const getUserProfile = async (userId) => {

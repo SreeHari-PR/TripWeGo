@@ -34,16 +34,17 @@ export function Navbar() {
 
   return (
     <header className="bg-white shadow-md">
-      <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-[#002233]">Dashboard</h1>
-        <div className="flex items-center space-x-4">
-          <button className="p-1 rounded-full text-[#002233] hover:bg-gray-100 focus:outline-none focus:ring">
+       <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-[#002233]">Manager</h1>
+        <div className="flex items-center space-x-6">
+          <button className="relative text-[#002233] p-2 hover:bg-gray-200 rounded-full focus:ring">
             <FaBell className="h-6 w-6" />
+            <span className="absolute top-0 right-0 block h-2.5 w-2.5 bg-red-600 border-white border-2 rounded-full"></span>
           </button>
           <div className="relative">
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center space-x-2 focus:outline-none"
+              className="flex items-center space-x-2 focus:outline-none hover:text-[#0066FF]"
             >
               <FaUser className="h-6 w-6 text-[#002233]" />
               <FaChevronDown
@@ -53,27 +54,23 @@ export function Navbar() {
               />
             </button>
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                  <div className="px-4 py-2">
-                    <p className="text-sm font-medium text-[#002233]">{manager.name}</p>
-                    <p className="text-xs text-gray-500">{manager.email}</p>
-                  </div>
-                  <div className="border-t border-gray-100"></div>
+              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                <div className="py-2">
+                  <p className="px-4 py-2 text-sm font-medium text-gray-800">{manager.name}</p>
+                  <p className="px-4 pb-2 text-xs text-gray-500">{manager.email}</p>
+                  <div className="border-t border-gray-200"></div>
                   <button
-                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                     onClick={() => navigate('/manager/manager-profile')}
-                    role="menuitem"
+                    className="flex items-center px-4 py-2 w-full text-left text-gray-700 hover:bg-gray-100"
                   >
-                    <FaUser className="mr-3 h-5 w-5 text-[#0066FF]" />
+                    <FaUser className="mr-2 h-4 w-4" />
                     Profile
                   </button>
                   <button
-                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                     onClick={handleLogout}
-                    role="menuitem"
+                    className="flex items-center px-4 py-2 w-full text-left text-gray-700 hover:bg-gray-100"
                   >
-                    <FaSignOutAlt className="mr-3 h-4 w-4 text-[#0066FF]" />
+                    <FaSignOutAlt className="mr-2 h-4 w-4" />
                     Log out
                   </button>
                 </div>
