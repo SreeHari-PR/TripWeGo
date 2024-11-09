@@ -75,6 +75,9 @@ class ManagerRepository {
             throw error;
         }
     }
+    async deductBalance(managerId, amount) {
+      return Manager.findByIdAndUpdate(managerId, { $inc: { walletBalance: -amount } }, { new: true });
+  }
 }
 
 module.exports = new ManagerRepository();

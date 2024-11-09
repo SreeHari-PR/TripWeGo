@@ -1,4 +1,3 @@
-// src/routes/ManagerRoutes.jsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import PrivateRoute from '../components/PrivateRoute';
@@ -17,11 +16,11 @@ const ManagerRoutes = () => (
     <Route path="/manager/register" element={<RegisterPage />} />
     <Route path="/manager/login" element={<LoginPage />} />
     <Route path="/manager/manager-otp" element={<ManagerOtpPage />} />
-    <Route path="/manager/dashboard" element={<PrivateRoute element={ManagerDashboard} />} />
-    <Route path="/manager/hotels" element={<PrivateRoute element={AdminHotelsPage} />} />
-    <Route path="/manager/manager-profile" element={<PrivateRoute element={ManagerProfilePage} />} />
-    <Route path="/manager/edit-profile" element={<PrivateRoute element={ManagerProfilePage} />} />
-    <Route path="/manager/reset-password" element={<PrivateRoute element={ManagerProfilePage} />} />
+    <Route path="/manager/dashboard" element={<PrivateRoute element={<ManagerDashboard />} />} />
+    <Route path="/manager/hotels" element={<PrivateRoute element={<AdminHotelsPage />} />} />
+    <Route path="/manager/manager-profile" element={<PrivateRoute element={<ManagerProfilePage />} />} />
+    <Route path="/manager/edit-profile" element={<PrivateRoute element={<ManagerProfilePage />} />} />
+    <Route path="/manager/reset-password" element={<PrivateRoute element={<ManagerProfilePage />} />} />
     <Route path="/manager/hotels/edit/:id" element={<EditHotelForm />} />
     <Route path="/manager/wallet" element={<ManagerWallet />} />
     <Route path="/manager/bookings" element={<ManagerBookingsPage />} />

@@ -12,10 +12,12 @@ const bookingSchema = new mongoose.Schema({
         ref: 'Hotel',
         required: true
     },
-    roomType: {
-        type: String,
-        required: true
-    },
+    roomTypes: [
+        {
+            type: String,
+            required: true
+        }
+    ],
     paymentId: {
         type: String,
         required: true
@@ -36,14 +38,18 @@ const bookingSchema = new mongoose.Schema({
         type: Date, 
         required: true 
     },
+    amount: {
+        type: Number,
+        required: true 
+    },
     createdAt: { 
         type: Date, 
         default: Date.now 
     },
     cancelled: {
-         type: Boolean, 
-         default: false 
-        },
+        type: Boolean, 
+        default: false 
+    }
 });
 
 module.exports = mongoose.model('Booking', bookingSchema);

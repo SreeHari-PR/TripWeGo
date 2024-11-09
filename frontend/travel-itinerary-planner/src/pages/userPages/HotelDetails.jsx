@@ -80,101 +80,102 @@ const HotelDetails = () => {
     }
   };
 
-  const handleRoomSelection = (room) => {
-    setSelectedRooms(prev => ({
-      ...prev,
-      [room.type]: !prev[room.type]
-    }));
-  };
+const handleRoomSelection = (room) => {
+  setSelectedRooms((prev) => ({
+    ...prev,
+    [room.type]: !prev[room.type],
+  }));
+};
+const handleBookNow = async () => {
+  try {
+    const [checkIn, checkOut] = dateRange;
 
-  const handleBookNow = async () => {
-    try {
-      const [checkIn, checkOut] = dateRange;
-
-      if (!checkIn || !checkOut) {
-        toast.error('Please select check-in and check-out dates');
-        return;
-      }
-
-      const selectedRoomTypes = Object.entries(selectedRooms)
-        .filter(([_, isSelected]) => isSelected)
-        .map(([roomType]) => roomType);
-
-      if (selectedRoomTypes.length === 0) {
-        toast.error('Please select at least one room type');
-        return;
-      }
-
-      const totalAmount = selectedRoomTypes.reduce((total, roomType) => {
-        const room = hotel.roomTypes.find(r => r.type === roomType);
-        return total + (room ? room.price : 0);
-      }, 0);
-
-      const response = await api.post(`/users/create-order`, {
-        amount: totalAmount * 100,
-        currency: 'INR',
-        hotelId: hotel._id,
-        roomTypes: selectedRoomTypes,
-        checkIn: checkIn.toISOString(),
-        checkOut: checkOut.toISOString()
-      });
-  
-      console.log('Order response:', response.data);
-      const { order } = response.data;
-  
-      const options = {
-        key: "rzp_test_rwud39pugiL6zo",
-        amount: order.amount,
-        currency: order.currency,
-        name: 'Hotel Booking',
-        description: `Booking rooms: ${selectedRoomTypes.join(', ')}`,
-        order_id: order.id,
-        handler: async function (response) {
-          const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
-          const token = localStorage.getItem('token'); 
-          console.log(token);
-
-          await api.post(
-            '/users/verify-payment',
-            {
-              paymentId: razorpay_payment_id,
-              orderId: razorpay_order_id,
-              signature: razorpay_signature,
-              hotelId: hotel._id,
-              roomTypes: selectedRoomTypes,
-              checkInDate: checkIn.toISOString(), 
-              checkOutDate: checkOut.toISOString(),
-              amount: totalAmount,
-            },
-            {
-              headers: {
-                Authorization: `${token}`
-              }
-            }
-          );
-          toast.success('Payment Successful! Booking confirmed.');
-          navigate('/bookings');
-        },
-        prefill: {
-          name: 'Trip We Go',
-          email: 'TripWeGo@gmail.com',
-          contact: '9876543210',
-        },
-      };
-  
-      if (window.Razorpay) {
-        const rzp = new window.Razorpay(options);
-        rzp.open();
-      } else {
-        toast.error('Failed to load Razorpay. Please try again.');
-      }
-  
-    } catch (error) {
-      console.error('Error during payment initiation:', error); 
-      toast.error('Failed to initiate payment');
+    if (!checkIn || !checkOut) {
+      toast.error('Please select check-in and check-out dates');
+      return;
     }
-  };
-  
+
+    if (checkOut <= checkIn) {
+      toast.error('Check-out date should be after check-in date');
+      return;
+    }
+    const selectedRoomTypes = Object.keys(selectedRooms).filter(
+      (roomType) => selectedRooms[roomType]
+    );
+
+    console.log("Selected Room Types:", selectedRoomTypes); // Debugging
+
+    if (selectedRoomTypes.length === 0) {
+      toast.error('Please select at least one room type');
+      return;
+    }
+
+    const totalAmount = selectedRoomTypes.reduce((total, roomType) => {
+      const room = hotel.roomTypes.find((r) => r.type === roomType);
+      return total + (room ? room.price : 0);
+    }, 0);
+
+    const response = await api.post(`/users/create-order`, {
+      amount: totalAmount * 100, 
+      currency: 'INR',
+      hotelId: hotel._id,
+      roomTypes: selectedRoomTypes, 
+      checkIn: checkIn.toISOString(),
+      checkOut: checkOut.toISOString(),
+    });
+
+    const { order } = response.data;
+
+    const options = {
+      key: "rzp_test_rwud39pugiL6zo",
+      amount: order.amount,
+      currency: order.currency,
+      name: 'Hotel Booking',
+      description: `Booking rooms: ${selectedRoomTypes.join(', ')}`,
+      order_id: order.id,
+      handler: async function (response) {
+        const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
+        const token = localStorage.getItem('token');
+
+        await api.post(
+          '/users/verify-payment',
+          {
+            paymentId: razorpay_payment_id,
+            orderId: razorpay_order_id,
+            signature: razorpay_signature,
+            hotelId: hotel._id,
+            roomTypes: selectedRoomTypes,
+            checkInDate: checkIn.toISOString(),
+            checkOutDate: checkOut.toISOString(),
+            amount: totalAmount,
+          },
+          {
+            headers: {
+              Authorization: `${token}`,
+            },
+          }
+        );
+        toast.success('Payment Successful! Booking confirmed.');
+        navigate('/bookings');
+      },
+      prefill: {
+        name: 'Trip We Go',
+        email: 'TripWeGo@gmail.com',
+        contact: '9876543210',
+      },
+    };
+
+    if (window.Razorpay) {
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } else {
+      toast.error('Failed to load Razorpay. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error during booking:', error);
+    toast.error('Failed to initiate payment');
+  }
+};
 
   if (!hotel) {
     return <div>Loading hotel details...</div>;

@@ -8,7 +8,8 @@ const MANAGER_SHARE_PERCENTAGE = 0.8;
 const ADMIN_SHARE_PERCENTAGE = 0.2;
 
 class PaymentService {
-  async createOrder(hotelId, roomType, amount) {
+  async createOrder(hotelId, amount) {
+    console.log('Received amount in PaymentService:', amount); 
     const currency = 'INR';
     const receipt = `receipt_${hotelId}`;
     const order = await PaymentRepository.createOrder(amount, currency, receipt);
@@ -19,7 +20,7 @@ class PaymentService {
 
   async verifyPayment(paymentId, orderId, signature, bookingDetails,amount) {
     const isValidSignature = await PaymentRepository.verifySignature(paymentId, orderId, signature);
-    console.log(amount,'amount')
+    console.log(bookingDetails,'bookingdetails')
     if (!isValidSignature) {
       throw new Error('Invalid payment signature');
     }

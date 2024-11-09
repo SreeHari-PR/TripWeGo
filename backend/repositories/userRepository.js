@@ -46,6 +46,29 @@ const updateUserProfilePicture = async (userId, profilePicturePath) => {
         throw new Error('Database error: Unable to update profile picture');
     }
 };
+const deductBalance = async (userId, amount) => {
+    try {
+        
+        console.log(userId, 'userId');
+        console.log(amount, 'amount');
+
+        // Find the user who is an admin and deduct the balance
+        const updatedUser = await User.findOneAndUpdate(
+            {  isAdmin: true }, 
+            { $inc: { walletBalance: -amount } },  
+            { new: true }                          
+        );
+
+        if (!updatedUser) {
+            throw new Error('Admin user not found or insufficient permissions');
+        }
+
+        return updatedUser;
+    } catch (error) {
+        console.error('Error in deducting balance:', error.message);
+        throw new Error(error.message || 'Error deducting balance');
+    }
+};
 
 
 
@@ -61,5 +84,6 @@ module.exports = {
     updateUserProfile, 
     updateUserProfilePicture,
     updatePassword,
+    deductBalance,
 
 };
