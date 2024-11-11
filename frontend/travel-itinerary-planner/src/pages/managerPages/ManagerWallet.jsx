@@ -18,6 +18,7 @@ const ManagerWallet = () => {
         setLoading(true)
         const response = await api.get(`/manager/wallet-transactions/${managerId}`)
         setWalletData(response.data.data)
+        console.log(response.data);
       } catch (err) {
         setError('Failed to fetch wallet and transaction data')
       } finally {
@@ -60,7 +61,7 @@ const ManagerWallet = () => {
                 <div className="flex items-center">
                   <DollarSign className="text-green-500 w-12 h-12 mr-2" />
                   <span className="text-4xl font-bold text-green-600">
-                    {walletData?.walletBalance.toFixed(2)}
+                    {walletData?.walletBalance?.toFixed(2) || '0.00'}
                   </span>
                 </div>
               </div>
@@ -70,13 +71,13 @@ const ManagerWallet = () => {
                   <div className="bg-blue-100 rounded-lg p-4">
                     <p className="text-sm text-blue-600 mb-1">Total Transactions</p>
                     <p className="text-2xl font-semibold text-blue-800">
-                      {walletData?.transactions.length}
+                      {walletData?.transactions?.length || 0}
                     </p>
                   </div>
                   <div className="bg-green-100 rounded-lg p-4">
                     <p className="text-sm text-green-600 mb-1">Last Transaction</p>
                     <p className="text-2xl font-semibold text-green-800">
-                      ${walletData?.transactions[0]?.amount.toFixed(2) || '0.00'}
+                      ${walletData?.transactions?.[0]?.amount?.toFixed(2) || '0.00'}
                     </p>
                   </div>
                 </div>
@@ -105,14 +106,14 @@ const ManagerWallet = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {walletData?.transactions.length ? (
+                      {walletData?.transactions?.length ? (
                         walletData.transactions.map((transaction) => (
                           <tr key={transaction._id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {new Date(transaction.date).toLocaleDateString()}
+                            {new Date(transaction.createdAt).toLocaleDateString()}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              {transaction.type === 'credit' ? (
+                              {transaction.transactionType === 'credit' ? (
                                 <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                   <ArrowDownLeft className="w-4 h-4 mr-1" /> Credit
                                 </span>
@@ -125,7 +126,7 @@ const ManagerWallet = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                               <span
                                 className={
-                                  transaction.type === 'credit'
+                                  transaction.transactionType === 'credit'
                                     ? 'text-green-600'
                                     : 'text-red-600'
                                 }

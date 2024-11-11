@@ -6,6 +6,8 @@ const categoryController=require('../controllers/categoryController')
 const authMiddleware=require('../middlewares/authMiddleware')
 const serviceController=require('../controllers/serviceController')
 const managerController=require('../controllers/managerController')
+const hotelController=require('../controllers/hotelController')
+const bookingController=require('../controllers/bookingController')
 const router = express.Router();
 
 
@@ -32,5 +34,12 @@ router.delete('/delete-category/:id', categoryController.deleteCategory);
 //service 
 router.post('/add-service', serviceController.createService);
 router.get('/services', serviceController.getAllServices);
+
+//hotels 
+
+router.get('/hotels',hotelController.listAllHotels)
+
+//bookings
+router.get('/bookings', bookingController.getBookings);
 
 module.exports = router;

@@ -3,6 +3,31 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
 
+const transactionSchema = new mongoose.Schema({
+    amount: {
+        type: Number,
+        required: true
+    },
+    transactionType: {
+        type: String,
+        enum: ['credit', 'debit'],
+        required: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'completed', 'failed'],
+        default: 'completed'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+}, { _id: false });
+
 const managerSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -29,23 +54,27 @@ const managerSchema = new mongoose.Schema({
     kyc: { 
         type: String
      },
-     profilePicture: {
+    profilePicture: {
         type: String,
         default: ''
-      },
-      isBlocked: {
+    },
+    isBlocked: {
         type: Boolean,
         default: false
     },   
     approved: {
-         type: Boolean, 
-         default: false 
-        },
+        type: Boolean, 
+        default: false 
+    },
     walletBalance: { 
-            type: Number, 
-            default: 0 
-        },
-        hotelId: { type: mongoose.Schema.Types.ObjectId, ref: 'Hotel' },
+        type: Number, 
+        default: 0 
+    },
+    hotelId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Hotel' 
+    },
+    transactions: [transactionSchema] 
 }, {
     timestamps: true
 });

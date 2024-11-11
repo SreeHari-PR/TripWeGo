@@ -52,7 +52,6 @@ const deductBalance = async (userId, amount) => {
         console.log(userId, 'userId');
         console.log(amount, 'amount');
 
-        // Find the user who is an admin and deduct the balance
         const updatedUser = await User.findOneAndUpdate(
             {  isAdmin: true }, 
             { $inc: { walletBalance: -amount } },  
@@ -67,6 +66,24 @@ const deductBalance = async (userId, amount) => {
     } catch (error) {
         console.error('Error in deducting balance:', error.message);
         throw new Error(error.message || 'Error deducting balance');
+    }
+};
+const addBalance = async (userId, amount) => {
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $inc: { walletBalance: amount } },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            throw new Error('User not found or insufficient permissions');
+        }
+
+        return updatedUser;
+    } catch (error) {
+        console.error('Error in adding balance to user:', error.message);
+        throw new Error('Error adding balance to user');
     }
 };
 
@@ -85,5 +102,6 @@ module.exports = {
     updateUserProfilePicture,
     updatePassword,
     deductBalance,
+    addBalance,
 
 };

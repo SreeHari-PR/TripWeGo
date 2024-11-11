@@ -40,8 +40,6 @@ class WalletRepository {
     }
     return updatedUser;
   }
-
-  // New method to create a transaction record
   async createTransaction(userId, amount, type, description) {
     return await Transaction.create({
       userId,
@@ -53,6 +51,22 @@ class WalletRepository {
   async getAdminWalletAndTransactions() {
     return await User.findOne({ isAdmin: true }).select('walletBalance transactions');
 }
+async addTransaction (userId, amount, type, description = '') {
+  try {
+      const transaction = new Transaction({
+          userId,
+          amount,
+          type,
+          description,
+      });
+
+      const savedTransaction = await transaction.save();
+      return savedTransaction;
+  } catch (error) {
+      console.error('Error creating transaction:', error.message);
+      throw new Error('Error creating transaction');
+  }
+};
 }
 
 module.exports = new WalletRepository();

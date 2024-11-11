@@ -52,6 +52,12 @@ class PaymentService {
         if (isNaN(manager.walletBalance)) {
           throw new Error(`Calculated walletBalance is NaN for manager with hotel ID: ${hotelId}`);
         }
+        manager.transactions.push({
+          amount: managerShare,
+          transactionType: 'credit',
+          description: 'Hotel booking earnings',
+          status: 'completed',
+        });
   
         await manager.save();
       } else {

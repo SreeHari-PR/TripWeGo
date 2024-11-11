@@ -89,6 +89,14 @@ class AdminController {
         res.status(500).json({ message: 'Error retrieving admin wallet and transactions' });
     }
 }
+async getHotels(req,res){
+    try {
+        
+    } catch (error) {
+        
+    }
+
+}
 }
 
 module.exports = new AdminController();

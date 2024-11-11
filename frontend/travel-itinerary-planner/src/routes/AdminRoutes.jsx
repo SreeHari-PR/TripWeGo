@@ -9,6 +9,8 @@ import AdminManagerList from '../pages/adminPages/ManagerList';
 import Services from '../pages/adminPages/Services';
 import ManagerDetails from '../pages/adminPages/Managerdetails';
 import AdminWallet from '../pages/adminPages/AdminWallet';
+import AdminHotelList from '../pages/adminPages/AdminHotelList';
+import AdminBookingList from '../pages/adminPages/AdminBookingList';
 
 const AdminRoutes = () => (
   <Routes>
@@ -20,6 +22,8 @@ const AdminRoutes = () => (
     <Route path="/admin/managers" element={<PrivateRoute element={<AdminManagerList />} />} />
     <Route path="/admin/managers/:id" element={<PrivateRoute element={<ManagerDetails />} />} />
     <Route path="/admin/wallet" element={<PrivateRoute element={<AdminWallet />} />} />
+    <Route path="/admin/hotels" element={<PrivateRoute element={<AdminHotelList />} />} />
+    <Route path="/admin/bookings" element={<PrivateRoute element={<AdminBookingList />} />} />
   </Routes>
 );
 

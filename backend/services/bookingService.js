@@ -2,7 +2,8 @@
 
 const bookingRepository = require('../repositories/bookingRepository');
 const managerRepository = require('../repositories/managerRepository');
-const userRepository=require('../repositories/userRepository')
+const userRepository=require('../repositories/userRepository');
+const walletRepository = require('../repositories/walletRepository');
 const bookingService = {
     async listUserBookings(userId) {
         try {
@@ -16,6 +17,8 @@ const bookingService = {
     async listManagerBookings(managerId) {
         try {
             const bookings = await bookingRepository.getBookingsByManager(managerId);
+            console.log(bookings,'manager');
+            
             return bookings;
         } catch (error) {
             throw error;
@@ -44,8 +47,8 @@ const bookingService = {
           console.log(`Refund Amount: ${refundAmount}`);
   
          
-          const adminDeduction = refundAmount * 0.3;
-          const managerDeduction = refundAmount * 0.7;
+          const adminDeduction = refundAmount * 0.2;
+          const managerDeduction = refundAmount * 0.8;
   
           
           if (adminDeduction > 0) {
@@ -54,7 +57,13 @@ const bookingService = {
           if (managerDeduction > 0) {
               await managerRepository.deductBalance(booking.hotelId.managerId, managerDeduction);
           }
-  
+          await userRepository.addBalance(booking.userId, refundAmount);
+          await walletRepository.addTransaction(
+            booking.userId,
+            refundAmount,
+            'credit',
+            'Booking refund'
+        );
           const cancelledBooking = await bookingRepository.cancelBooking(bookingId);
           cancelledBooking.refundAmount = refundAmount; 
           return cancelledBooking;
@@ -62,7 +71,10 @@ const bookingService = {
           console.error('Error cancelling booking:', error);
           throw new Error('Error canceling booking');
       }
-  }
+  },
+  async listBookings(page, limit, search) {
+    return await bookingRepository.getBookings(page, limit, search);
+  },
   
 };
 
