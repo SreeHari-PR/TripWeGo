@@ -7,6 +7,7 @@ const paymentcontroller=require('../controllers/paymentController')
 const hotelController = require('../controllers/hotelController');
 const bookingController = require('../controllers/bookingController');
 const walletController=require('../controllers/walletController')
+const OlaMapsController = require('../controllers/OlaMapsContoller');
 const {profilePictureUpload} = require('../middlewares/multer');
 
 
@@ -48,6 +49,10 @@ router.delete('/bookings/:bookingId/cancel', authMiddleware, bookingController.c
 router.get('/wallet/balance', authMiddleware, walletController.getBalance);
 router.post('/wallet/add-funds', authMiddleware, walletController.addFunds);
 router.post('/wallet/deduct-funds', authMiddleware, walletController.deductFunds);
+
+
+//maps
+router.get('/autocomplete', OlaMapsController.autocomplete);
 
 
 module.exports = router;

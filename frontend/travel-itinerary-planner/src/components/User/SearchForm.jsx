@@ -1,53 +1,46 @@
-import React, { useState, useEffect } from 'react'
-import { Search, Calendar, Users, X } from 'lucide-react'
+import React, { useState, useEffect } from 'react';
+import { Search, Calendar, Users, X } from 'lucide-react';
 import api from "../../services/api";
 
 export default function SearchForm({ onSearch }) {
-  const [location, setLocation] = useState('')
-  const [suggestions, setSuggestions] = useState([])
-  const [checkIn, setCheckIn] = useState('')
-  const [checkOut, setCheckOut] = useState('')
-  const [guests, setGuests] = useState(1)
-
-  const apiKey = "misuPg8ruDVSxV4Iad8C3TTNUdswhwoLHds9vANS";
+  const [location, setLocation] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [guests, setGuests] = useState(1);
 
   useEffect(() => {
-    const apiKey = 'misuPg8ruDVSxV4Iad8C3TTNUdswhwoLHds9vANS';       // Replace with actual API key
-    const token = localStorage.getItem('token')
-    
     const fetchSuggestions = async () => {
+      if (!location) {
+        setSuggestions([]);
+        return;
+      }
+
       try {
-        const response = await fetch(
-          `https://api.olamaps.io/places/v1/autocomplete?input=${location}&api_key=${apiKey}`, 
-          {
-            headers: {
-             'Authorization': `Bearer ${token}`
-            },
-          }
-        );
-    
-        if (!response.ok) {
-          throw new Error('Unauthorized access - please check API key and headers');
+        const response = await api.get('/users/autocomplete', {
+          params: { query: location },
+        });
+        if (response.data?.predictions) {
+          const newSuggestions = response.data.predictions.map(prediction => prediction.description);
+          setSuggestions(newSuggestions);
+        } else {
+          setSuggestions([]);
         }
-    
-        const data = await response.json();
-        setSuggestions(data.suggestions || []);
       } catch (error) {
         console.error('Error fetching autocomplete suggestions:', error);
+        setSuggestions([]);
       }
     };
 
-    const debounceTimer = setTimeout(fetchSuggestions, 300);
+    const debounceTimer = setTimeout(fetchSuggestions, 500);
     return () => clearTimeout(debounceTimer);
-  }, [location, apiKey]);
+  }, [location]);
 
-  // Handle location selection from suggestions
   const handleSuggestionClick = (suggestion) => {
     setLocation(suggestion);
     setSuggestions([]);
   };
 
-  // Handle search submission
   const handleSearch = async (e) => {
     e.preventDefault();
 
@@ -68,7 +61,7 @@ export default function SearchForm({ onSearch }) {
   };
 
   return (
-    <div className="w-full mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="w-full mx-auto bg-white rounded-lg shadow-lg  relative">
       <form onSubmit={handleSearch} className="flex flex-col md:flex-row">
         <div className="flex-1 p-4 border-b md:border-b-0 md:border-r border-gray-200 relative">
           <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location</label>
@@ -81,6 +74,7 @@ export default function SearchForm({ onSearch }) {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className="w-full pl-10 pr-3 py-2 border-gray-300 rounded-md focus:ring-[#00246B] focus:border-[#00246B]"
+              autoComplete="off"
             />
             {location && (
               <button
@@ -93,7 +87,7 @@ export default function SearchForm({ onSearch }) {
             )}
           </div>
           {suggestions.length > 0 && (
-            <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+            <ul className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
               {suggestions.map((suggestion, index) => (
                 <li
                   key={index}
@@ -106,6 +100,7 @@ export default function SearchForm({ onSearch }) {
             </ul>
           )}
         </div>
+
         <div className="flex-1 p-4 border-b md:border-b-0 md:border-r border-gray-200">
           <label htmlFor="check-in" className="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
           <div className="relative">
@@ -156,5 +151,5 @@ export default function SearchForm({ onSearch }) {
         </div>
       </form>
     </div>
-  )
+  );
 }
