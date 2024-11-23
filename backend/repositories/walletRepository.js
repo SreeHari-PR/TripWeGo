@@ -49,8 +49,24 @@ class WalletRepository {
     });
   }
   async getAdminWalletAndTransactions() {
-    return await User.findOne({ isAdmin: true }).select('walletBalance transactions');
-}
+    try {
+      const adminUser = await User.findOne({ isAdmin: true }).select('walletBalance');
+      console.log(adminUser,'kjljdsj');
+      
+      if (!adminUser) {
+        throw new Error('Admin user not found');
+      }
+      const transactions = await Transaction.find({ userId: adminUser._id });
+      console.log(transactions,'hsdjh')
+      return {
+        walletBalance: adminUser.walletBalance,
+        transactions: transactions,
+      };
+    } catch (error) {
+      console.error('Error fetching wallet balance and transactions:', error);
+      throw error;
+    }
+  }
 async addTransaction (userId, amount, type, description = '') {
   try {
       const transaction = new Transaction({

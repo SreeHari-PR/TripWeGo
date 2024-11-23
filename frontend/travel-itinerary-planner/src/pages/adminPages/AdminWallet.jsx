@@ -14,10 +14,11 @@ const AdminWallet = () => {
             try {
                 setLoading(true);
                 const response = await api.get('/admin/wallet-transactions');
+                console.log(response.data)
                 setWallet(response.data.data.walletBalance);
                 setTransactions(response.data.data.transactions);
                 console.log(response.data.data.transactions);
-                
+
             } catch (error) {
                 console.error('Error fetching admin wallet details:', error);
                 setError('Failed to fetch wallet data. Please try again later.');
@@ -25,7 +26,7 @@ const AdminWallet = () => {
                 setLoading(false);
             }
         };
-        
+
         fetchAdminWallet();
     }, []);
 
@@ -87,34 +88,43 @@ const AdminWallet = () => {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                                     </tr>
                                 </thead>
-                                {/* <tbody className="bg-white divide-y divide-gray-200">
-                                    {transactions.map((transaction, index) => (
-                                        <tr key={index}>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {new Date(transaction.date).toLocaleDateString()}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {transaction.description}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <span className={transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'}>
-                                                    ${transaction.amount.toFixed(2)}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                {transaction.type === 'credit' ? (
-                                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                        <ArrowDownLeft className="w-4 h-4 mr-1" /> Credit
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {transactions.length > 0 ? (
+                                        transactions.map((transaction, index) => (
+                                            <tr key={index}>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {new Date(transaction.date).toLocaleDateString()}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    {transaction.description}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <span className={transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'}>
+                                                        ${transaction.amount.toFixed(2)}
                                                     </span>
-                                                ) : (
-                                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                        <ArrowUpRight className="w-4 h-4 mr-1" /> Debit
-                                                    </span>
-                                                )}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                    {transaction.type === 'credit' ? (
+                                                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                            <ArrowDownLeft className="w-4 h-4 mr-1" /> Credit
+                                                        </span>
+                                                    ) : (
+                                                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                            <ArrowUpRight className="w-4 h-4 mr-1" /> Debit
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">
+                                                No transactions available
                                             </td>
                                         </tr>
-                                    ))}
-                                </tbody> */}
+                                    )}
+                                </tbody>
+
                             </table>
                         </div>
                     </div>

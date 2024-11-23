@@ -62,19 +62,43 @@ class ManagerRepository {
             if (!manager) {
                 throw new Error('Manager not found');
             }
-            
+    
+            const sortedTransactions = manager.transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
             return {
                 walletBalance: manager.walletBalance,
-                transactions:manager.transactions 
+                transactions: sortedTransactions
             };
         } catch (error) {
             console.error('Error retrieving wallet and transactions:', error);
             throw error;
         }
     }
+    
+    
     async deductBalance(managerId, amount) {
-      return Manager.findByIdAndUpdate(managerId, { $inc: { walletBalance: -amount } }, { new: true });
+      try {
+          const transaction = {
+              date: new Date(),
+              description: 'Balance deduction',
+              amount: amount,
+              transactioType: 'debit'
+          };
+  
+          return await Manager.findByIdAndUpdate(
+              managerId,
+              {
+                  $inc: { walletBalance: -amount },
+                  $push: { transactions: transaction }
+              },
+              { new: true }
+          );
+      } catch (error) {
+          console.error('Error deducting balance and adding transaction:', error);
+          throw error;
+      }
   }
+  
 }
 
 module.exports = new ManagerRepository();

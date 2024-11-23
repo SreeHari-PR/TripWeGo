@@ -14,8 +14,9 @@ class HotelRepository {
   }
   async getAllHotels() {
     try {
-      const hotels = await Hotel.find({isListed: true});
+      const hotels = await Hotel.find({isListed: true})
       return hotels;
+      
     } catch (error) {
       throw new Error('Error fetching hotels: ' + error.message);
     }

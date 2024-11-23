@@ -64,7 +64,7 @@ class AdminService {
         return user;
     }
     async getAdminWalletDetails() {
-        // Fetch wallet details and transactions for the admin user from repository
+       
         const admin = await walletRepository.getAdminWalletAndTransactions();
         
         if (!admin) {

@@ -12,34 +12,64 @@ const router = express.Router();
 
 
 
+// router.post('/login', adminController.login);
+// router.get('/users',authMiddleware, adminController.listUsers);
+// router.get('/managers',authMiddleware, adminController.listManagers);
+// router.get('/managers/:id', adminController.getManagerDetails);
+// router.get('/managers', adminController.getManagers);
+// router.post('/managers/block', managerController.blockManager);
+// router.post('/managers/unblock', managerController.unblockManager);
+// router.post('/managers/:id/approve', adminController.approveManager);
+// router.post('/users/:id/block', adminController.blockUser);
+// router.post('/users/:id/unblock', adminController.unblockUser);
+
+// router.get('/wallet-transactions',adminController.getAdminWallet);
+
+// //category controller
+
+// router.post('/add-category', categoryController.addCategory);
+// router.get('/categories', categoryController.getCategories);
+// router.delete('/delete-category/:id', categoryController.deleteCategory);
+
+// //service 
+// router.post('/add-service', serviceController.createService);
+// router.get('/services', serviceController.getAllServices);
+
+// //hotels 
+
+// router.get('/hotels',hotelController.listAllHotels)
+
+// //bookings
+// router.get('/bookings',authMiddleware,bookingController.getBookings);
+
+// module.exports = router;
+
+
 router.post('/login', adminController.login);
-router.get('/users',authMiddleware, adminController.listUsers);
-router.get('/managers',authMiddleware, adminController.listManagers);
-router.get('/managers/:id', adminController.getManagerDetails);
-router.get('/managers', adminController.getManagers);
-router.post('/managers/block', managerController.blockManager);
-router.post('/managers/unblock', managerController.unblockManager);
-router.post('/managers/:id/approve', adminController.approveManager);
-router.post('/users/:id/block', adminController.blockUser);
-router.post('/users/:id/unblock', adminController.unblockUser);
+router.get('/users', authMiddleware, adminController.listUsers);
+router.get('/managers', authMiddleware, adminController.listManagers);
+router.get('/managers/:id', authMiddleware, adminController.getManagerDetails);
+router.post('/managers/block', authMiddleware, managerController.blockManager);
+router.post('/managers/unblock', authMiddleware, managerController.unblockManager);
+router.post('/managers/:id/approve', authMiddleware, adminController.approveManager);
+router.post('/users/:id/block', authMiddleware, adminController.blockUser);
+router.post('/users/:id/unblock', authMiddleware, adminController.unblockUser);
 
-router.get('/wallet-transactions',adminController.getAdminWallet);
+router.get('/wallet-transactions', authMiddleware, adminController.getAdminWallet);
 
-//category controller
+// Category Controller
+router.post('/add-category', authMiddleware, categoryController.addCategory);
+router.get('/categories', categoryController.getCategories); // Public
+router.delete('/delete-category/:id', authMiddleware, categoryController.deleteCategory);
 
-router.post('/add-category', categoryController.addCategory);
-router.get('/categories', categoryController.getCategories);
-router.delete('/delete-category/:id', categoryController.deleteCategory);
+// Service Controller
+router.post('/add-service', authMiddleware, serviceController.createService);
+router.get('/services', serviceController.getAllServices); // Public
 
-//service 
-router.post('/add-service', serviceController.createService);
-router.get('/services', serviceController.getAllServices);
+// Hotels
+router.get('/hotels', authMiddleware, hotelController.listAllHotels);
 
-//hotels 
-
-router.get('/hotels',hotelController.listAllHotels)
-
-//bookings
-router.get('/bookings', bookingController.getBookings);
+// Bookings
+router.get('/bookings', authMiddleware, bookingController.getBookings);
 
 module.exports = router;

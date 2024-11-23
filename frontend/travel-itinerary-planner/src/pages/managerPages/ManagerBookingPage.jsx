@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { Hotel, Bed, CalendarCheck, CalendarX, Loader, CheckCircle, AlertCircle, Eye, X } from 'lucide-react';
+import { Hotel, Bed, CalendarCheck, CalendarX, Loader, CheckCircle, AlertCircle, Eye, X, ChevronLeft, ChevronRight, DollarSign, CreditCard, Calendar } from 'lucide-react';
 import api from '../../services/api';
 import { Sidebar } from '../../components/Manager/ManagerSidebar';
 import { Navbar } from '../../components/Manager/ManagerNavbar';
@@ -11,6 +11,8 @@ const ManagerBookingsPage = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [bookingsPerPage] = useState(10);
 
     useEffect(() => {
         const fetchManagerBookings = async () => {
@@ -46,6 +48,14 @@ const ManagerBookingsPage = () => {
         setIsModalOpen(false);
         setSelectedBooking(null);
     };
+
+    // Pagination logic
+    const indexOfLastBooking = currentPage * bookingsPerPage;
+    const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
+    const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
+    const totalPages = Math.ceil(bookings.length / bookingsPerPage);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     if (loading) {
         return (
@@ -88,7 +98,7 @@ const ManagerBookingsPage = () => {
                                 </tr>
                             </thead>
                             <tbody className="text-gray-600 text-sm font-light">
-                                {bookings.map((booking) => (
+                                {currentBookings.map((booking) => (
                                     <tr key={booking._id} className="border-b border-gray-200 hover:bg-gray-100">
                                         <td className="py-3 px-6 text-left whitespace-nowrap">
                                             <div className="flex items-center">
@@ -140,7 +150,7 @@ const ManagerBookingsPage = () => {
                                         <td className="py-3 px-6 text-left">
                                             <button
                                                 onClick={() => handleViewDetails(booking)}
-                                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-flex items-center"
+                                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-flex items-center transition duration-300 ease-in-out"
                                             >
                                                 <Eye className="mr-2" />
                                                 View Details
@@ -151,37 +161,113 @@ const ManagerBookingsPage = () => {
                             </tbody>
                         </table>
                     </div>
+                    <div className="mt-4 flex justify-center">
+                        <nav className="inline-flex rounded-md shadow">
+                            <button
+                                onClick={() => paginate(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 ease-in-out"
+                            >
+                                <span className="sr-only">Previous</span>
+                                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                            </button>
+                            {[...Array(totalPages)].map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => paginate(index + 1)}
+                                    className={`px-4 py-2 border border-gray-300 text-sm font-medium ${
+                                        currentPage === index + 1
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50'
+                                    } transition duration-300 ease-in-out`}
+                                >
+                                    {index + 1}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => paginate(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 ease-in-out"
+                            >
+                                <span className="sr-only">Next</span>
+                                <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                            </button>
+                        </nav>
+                    </div>
                 </div>
             </div>
 
             {isModalOpen && selectedBooking && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded-lg max-w-md w-full">
-                        <div className="flex justify-between items-center mb-4">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden transform transition-all duration-300 ease-in-out">
+                        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 flex justify-between items-center">
                             <h3 className="text-xl font-bold">Booking Details</h3>
-                            <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
-                                <X />
+                            <button onClick={closeModal} className="text-white hover:text-gray-200 transition duration-300 ease-in-out">
+                                <X className="h-6 w-6" />
                             </button>
                         </div>
-                        <div className="space-y-4">
-                            <div>
-                                <span className="font-bold">Hotel:</span> {selectedBooking.hotelId.name}
+                        <div className="p-6 space-y-6">
+                            <div className="flex items-center space-x-4">
+                                <Hotel className="h-8 w-8 text-blue-500" />
+                                <div>
+                                    <p className="text-sm text-gray-500">Hotel</p>
+                                    <p className="font-semibold">{selectedBooking.hotelId.name}</p>
+                                </div>
                             </div>
-                            <div>
-                                <span className="font-bold">Room Type(s):</span> {selectedBooking.roomTypes.join(', ')}
+                            <div className="flex items-center space-x-4">
+                                <Bed className="h-8 w-8 text-blue-500" />
+                                <div>
+                                    <p className="text-sm text-gray-500">Room Type(s)</p>
+                                    <p className="font-semibold">{selectedBooking.roomTypes.join(', ')}</p>
+                                </div>
                             </div>
-                            <div>
-                                <span className="font-bold">Check-In:</span> {new Date(selectedBooking.checkInDate).toLocaleDateString()}
+                            <div className="flex items-center space-x-4">
+                                <Calendar className="h-8 w-8 text-blue-500" />
+                                <div>
+                                    <p className="text-sm text-gray-500">Check-In</p>
+                                    <p className="font-semibold">{new Date(selectedBooking.checkInDate).toLocaleDateString()}</p>
+                                </div>
                             </div>
-                            <div>
-                                <span className="font-bold">Check-Out:</span> {new Date(selectedBooking.checkOutDate).toLocaleDateString()}
+                            <div className="flex items-center space-x-4">
+                                <Calendar className="h-8 w-8 text-blue-500" />
+                                <div>
+                                    <p className="text-sm text-gray-500">Check-Out</p>
+                                    <p className="font-semibold">{new Date(selectedBooking.checkOutDate).toLocaleDateString()}</p>
+                                </div>
                             </div>
-                            <div>
-                                <span className="font-bold">Total Amount:</span> ${selectedBooking.amount}
+                            <div className="flex items-center space-x-4">
+                                <DollarSign className="h-8 w-8 text-blue-500" />
+                                <div>
+                                    <p className="text-sm text-gray-500">Total Amount</p>
+                                    <p className="font-semibold">${selectedBooking.amount}</p>
+                                </div>
                             </div>
-                            <div>
-                                <span className="font-bold">Payment Status:</span> {selectedBooking.paymentStatus}
+                            <div className="flex items-center space-x-4">
+                                <CreditCard className="h-8 w-8 text-blue-500" />
+                                <div>
+                                    <p className="text-sm text-gray-500">Payment Status</p>
+                                    <p className={`font-semibold ${selectedBooking.paymentStatus === 'Paid' ? 'text-green-600' : 'text-yellow-600'}`}>
+                                        {selectedBooking.paymentStatus}
+                                    </p>
+                                </div>
                             </div>
+                            <div className="flex items-center space-x-4">
+                                <AlertCircle className="h-8 w-8 text-blue-500" />
+                                <div>
+                                    <p className="text-sm text-gray-500">Booking Status</p>
+                                    <p className={`font-semibold ${selectedBooking.cancelled ? 'text-red-600' : 'text-green-600'}`}>
+                                        {selectedBooking.cancelled ? 'Cancelled' : 'Confirmed'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-gray-50 px-6 py-4 flex justify-end">
+                            <button
+                                onClick={closeModal}
+                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+                            >
+                                Close
+                            </button>
                         </div>
                     </div>
                 </div>

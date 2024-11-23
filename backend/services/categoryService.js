@@ -2,6 +2,8 @@
 const CategoryRepository=require('../repositories/categoryRepository')
 
 class CategoryService{
+
+    
     async createCategory(categoryData){
         const {name}=categoryData;
         const existingCategory=await CategoryRepository.getAllCategories();

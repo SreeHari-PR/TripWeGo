@@ -96,6 +96,13 @@ const loginUser = async (email, password) => {
 
     
     const token = user.generateAuthToken();
+    const refreshToken = user.generateRefreshToken();
+    
+
+        user.refreshToken = refreshToken;
+        await user.save();
+
+
     return { 
         token,
         user: {

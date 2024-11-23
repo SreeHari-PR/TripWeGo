@@ -7,8 +7,9 @@ const paymentcontroller=require('../controllers/paymentController')
 const hotelController = require('../controllers/hotelController');
 const bookingController = require('../controllers/bookingController');
 const walletController=require('../controllers/walletController')
+const categoryController=require('../controllers/categoryController')
 const OlaMapsController = require('../controllers/OlaMapsContoller');
-const {profilePictureUpload} = require('../middlewares/multer');
+
 
 
 
@@ -25,13 +26,14 @@ router.post('/verify-otp-password-reset', userController.verifyOtpForPasswordRes
 router.post('/reset-password', userController.resetPasswordHandler);
 router.post('/resetpassword', authMiddleware, userController.userresetPassword);
 router.put('/profile', authMiddleware, userController.editProfile);
-router.post('/upload-profile-picture', authMiddleware, profilePictureUpload, userController.uploadProfilePictureHandler);
+router.post('/upload-profile-picture', authMiddleware, userController.uploadProfilePictureHandler);
 
 
 //hotels
 router.get('/hotels', hotelController.listAllHotels);
 router.get('/search', hotelController.searchHotels);
 router.get('/hotels/:id', hotelController.getHotel);
+router.get('/categories', categoryController.getCategories); // Public
 
 //bookings
 

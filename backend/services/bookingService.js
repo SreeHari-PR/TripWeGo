@@ -47,8 +47,8 @@ const bookingService = {
           console.log(`Refund Amount: ${refundAmount}`);
   
          
-          const adminDeduction = refundAmount * 0.2;
-          const managerDeduction = refundAmount * 0.8;
+          const adminDeduction = refundAmount * 0.3;
+          const managerDeduction = refundAmount * 0.7;
   
           
           if (adminDeduction > 0) {

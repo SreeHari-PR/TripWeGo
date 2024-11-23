@@ -69,19 +69,10 @@ export default function Dashboard() {
     <div>
       <StickyNavbar />
       <HeroSection onSearch={handleSearch} location={location} />
-      
-      {/* {locationError ? (
-        <p className="text-red-500 text-center mt-4">{locationError}</p>
-      ) : location.latitude && location.longitude ? (
-        <p className="text-center mt-4">
-          Current Location - Latitude: {location.latitude}, Longitude: {location.longitude}
-        </p>
-      ) : (
-        <p className="text-center mt-4">Loading location...</p>
-      )} */}
 
       <FeaturedHotels hotels={searchActive ? searchedHotels : featuredHotels} />
       <Carousel
+       hotels={featuredHotels}
         currentSlide={currentSlide}
         nextSlide={nextSlide}
         prevSlide={prevSlide}
