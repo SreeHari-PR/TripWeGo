@@ -85,7 +85,8 @@ const bookingRepository = {
             console.error("Error fetching bookings with pagination and search:", error);
             throw error;
         }
-    }
+    },
+      
 };
 
 module.exports = bookingRepository;

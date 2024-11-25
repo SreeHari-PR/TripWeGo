@@ -56,7 +56,7 @@ class WalletRepository {
       if (!adminUser) {
         throw new Error('Admin user not found');
       }
-      const transactions = await Transaction.find({ userId: adminUser._id });
+      const transactions = await Transaction.find({ userId: adminUser._id }).sort({ date: -1 }); 
       console.log(transactions,'hsdjh')
       return {
         walletBalance: adminUser.walletBalance,

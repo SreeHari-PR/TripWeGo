@@ -211,7 +211,7 @@ export default function ProfilePage() {
                           value={profile.name}
                           onChange={handleInputChange}
                           disabled={!isEditing}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
+                          className="mt-1 block px-4 w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
                         />
                       </div>
                       <div>
@@ -222,7 +222,7 @@ export default function ProfilePage() {
                           value={profile.email}
                           onChange={handleInputChange}
                           disabled={!isEditing}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
+                          className="mt-1 block px-4 w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
                         />
                       </div>
                     </div>
@@ -262,7 +262,7 @@ export default function ProfilePage() {
                           type="password"
                           value={passwordData.currentPassword}
                           onChange={handlePasswordChange}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
+                          className="mt-1 block px-4 w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
                         />
                       </div>
                       <div>
@@ -272,7 +272,7 @@ export default function ProfilePage() {
                           type="password"
                           value={passwordData.newPassword}
                           onChange={handlePasswordChange}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
+                          className="mt-1 block px-4 w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
                         />
                       </div>
                       <div>
@@ -282,7 +282,7 @@ export default function ProfilePage() {
                           type="password"
                           value={passwordData.confirmPassword}
                           onChange={handlePasswordChange}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
+                          className="mt-1 block px-4 w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-[#00246B] focus:ring focus:ring-[#CADCFC] focus:ring-opacity-50"
                         />
                       </div>
                     </div>

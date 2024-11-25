@@ -79,6 +79,7 @@ const Login = () => {
                       type="email"
                       id="email"
                       className="pl-10 pr-4 py-2 block w-full border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder='Enter Your Email'
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -94,6 +95,7 @@ const Login = () => {
                       type={showPassword ? 'text' : 'password'}
                       id="password"
                       className="pl-10 pr-10 py-2 block w-full border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder='Enter Your Password'
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required

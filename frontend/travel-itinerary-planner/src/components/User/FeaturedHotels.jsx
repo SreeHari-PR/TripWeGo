@@ -44,7 +44,7 @@ export default function FeaturedHotels({ hotels }) {
                   {hotel.location?.address}, {hotel.location?.city}, {hotel.location?.state}, {hotel.location?.country}
                 </p>
                 <p className="flex items-center mb-4 text-[#00246B]">
-                  <FaStar className="w-4 h-4 mr-2 text-yellow-400" /> {hotel.rating} ({hotel.reviews} reviews)
+                  <FaStar className="w-4 h-4 mr-2 text-yellow-400" /> {hotel.rating} Rating
                 </p>
                 <div className="flex justify-between items-center">
                   <button className="bg-[#00246B] hover:bg-[#CADCFC] text-[#CADCFC] hover:text-[#00246B] font-bold py-2 px-4 rounded transition duration-300 ease-in-out">

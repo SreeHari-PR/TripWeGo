@@ -1,5 +1,6 @@
 // src/controllers/hotelController.js
 const hotelService = require('../services/hotelService');
+const hotelRepository=require('../repositories/hotelRepository')
 
 class HotelController {
 
@@ -162,6 +163,33 @@ class HotelController {
             });
           }
         }
+        async addReview(req, res) {
+          const { hotelId } = req.params;
+          const { userId, rating, comment } = req.body;
+        
+          try {
+            if (!rating || rating < 0 || rating > 5) {
+              return res.status(400).json({ message: 'Rating must be between 0 and 5' });
+            }
+        
+            const response = await hotelRepository.addReviewToHotel(hotelId, userId, rating, comment);
+        
+            return res.status(200).json(response);
+          } catch (error) {
+            console.error('Error adding review:', error);
+            return res.status(500).json({ message: error.message });
+          }
+        };
+        async  getHotelReviews (req, res){
+          const { hotelId } = req.params;
+        
+          try {
+            const reviews = await hotelService.fetchHotelReviews(hotelId);
+            res.status(200).json({ success: true, reviews });
+          } catch (error) {
+            res.status(400).json({ success: false, message: error.message });
+          }
+        };
           
 
 }

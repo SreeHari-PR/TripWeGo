@@ -1,6 +1,5 @@
 // src/repositories/managerRepository.js
 const { Manager } = require('../models/managerModel')
-const Transaction=require('../models/transactionModel')
 
 class ManagerRepository {
     async createManager(managerData) {

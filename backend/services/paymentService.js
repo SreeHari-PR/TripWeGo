@@ -2,6 +2,7 @@
 const PaymentRepository = require('../repositories/paymentRepository');
 const {User} = require('../models/userModel'); 
 const Hotel=require('../models/hotelModel')
+const Transaction=require('../models/transactionModel')
 
 
 const MANAGER_SHARE_PERCENTAGE = 0.8;
@@ -67,12 +68,22 @@ class PaymentService {
       if (adminUser) {
         const currentAdminWalletBalance = adminUser.walletBalance || 0; 
         adminUser.walletBalance = currentAdminWalletBalance + adminShare;
+        
   
         if (isNaN(adminUser.walletBalance)) {
           throw new Error('Calculated walletBalance is NaN for admin user.');
         }
   
         await adminUser.save();
+
+        const adminTransaction = new Transaction({
+          userId: adminUser._id,
+          amount: adminShare,
+          type: 'credit',
+          description: 'Hotel booking admin earnings',
+      });
+
+      await adminTransaction.save();
       } else {
         console.error('Admin account not found');
       }

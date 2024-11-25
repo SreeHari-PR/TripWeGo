@@ -34,6 +34,8 @@ router.get('/hotels', hotelController.listAllHotels);
 router.get('/search', hotelController.searchHotels);
 router.get('/hotels/:id', hotelController.getHotel);
 router.get('/categories', categoryController.getCategories); // Public
+router.post('/hotels/:hotelId/addreviews',authMiddleware,hotelController.addReview);
+router.get('/hotels/:hotelId/reviews',authMiddleware, hotelController.getHotelReviews);
 
 //bookings
 

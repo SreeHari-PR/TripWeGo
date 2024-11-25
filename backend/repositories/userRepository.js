@@ -1,5 +1,5 @@
 const { User } = require('../models/userModel');
-
+const Transaction = require('../models/transactionModel');
 
 const findUserByEmail = async (email) => {
     return await User.findOne({ email });
@@ -46,23 +46,41 @@ const updateUserProfilePicture = async (userId, profilePicturePath) => {
         throw new Error('Database error: Unable to update profile picture');
     }
 };
-const deductBalance = async (userId, amount) => {
+const deductBalance = async (userId, amount, description = 'Balance deducted') => {
     try {
-        
-        console.log(userId, 'userId');
-        console.log(amount, 'amount');
+        console.log(userId, 'Initiating userId');
+        console.log(amount, 'Deduction amount');
 
-        const updatedUser = await User.findOneAndUpdate(
-            {  isAdmin: true }, 
-            { $inc: { walletBalance: -amount } },  
-            { new: true }                          
-        );
-
-        if (!updatedUser) {
-            throw new Error('Admin user not found or insufficient permissions');
+       
+        const adminUser = await User.findOne({ isAdmin: true });
+        if (!adminUser) {
+            throw new Error('Admin user not found');
         }
 
-        return updatedUser;
+        const updatedAdmin = await User.findByIdAndUpdate(
+            adminUser._id, 
+            { $inc: { walletBalance: -amount } }, 
+            { new: true } 
+        );
+
+        if (!updatedAdmin) {
+            throw new Error('Failed to update admin balance');
+        }
+
+      
+        const transaction = new Transaction({
+            userId: adminUser._id, 
+            amount,
+            type: 'debit',
+            description,
+        });
+
+        await transaction.save(); 
+
+        return {
+            updatedAdmin,
+            transaction,
+        };
     } catch (error) {
         console.error('Error in deducting balance:', error.message);
         throw new Error(error.message || 'Error deducting balance');

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, MapPin, Phone, Mail, Globe, Clock, Calendar, Wifi, Car, Coffee,Bell, ChevronLeft, ChevronRight, Users, Lamp, Shirt } from 'lucide-react';
+import { Star, MapPin, Phone, Mail, Globe, Clock, Calendar, Wifi, Car, Coffee,Bell, ChevronLeft, ChevronRight, Users, Lamp, Shirt,BedDouble } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
 import StickyNavbar from '../../components/User/Navbar';
 import DateRangePicker from '../../components/User/DateRangePicker';
+import ReviewComponent from '../../components/User/ReviewComponent';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -17,6 +18,7 @@ const HotelDetails = () => {
   const [selectedRooms, setSelectedRooms] = useState({});
   const [dateRange, setDateRange] = useState([null, null]);
   const [mapData, setMapData] = useState(null);
+  const [reviews, setReviews] = useState([]);
 
   const handleDateChange = (update) => {
     setDateRange(update);
@@ -29,7 +31,10 @@ const HotelDetails = () => {
       try {
         const response = await api.get(`/users/hotels/${id}`);
         setHotel(response.data.hotel);
-        
+            //  Fetch reviews
+             const reviewsResponse = await api.get(`/users/hotels/${id}/reviews`);
+             setReviews(reviewsResponse.data.reviews);
+             console.log(reviewsResponse.data,'kjkl')
         const olaResponse = await fetch(`https://api.olamaps.io/places/v1/geocode?address=${encodeURIComponent(response.data.hotel.location.city)}&language=English&api_key=${apikey}`);
         const olaData = await olaResponse.json();
         setMapData(olaData);
@@ -176,6 +181,15 @@ const HotelDetails = () => {
       toast.error('Failed to initiate payment');
     }
   };
+  const handleAddReview = async (newReview) => {
+    try {
+      const response = await api.post(`/users/hotels/${id}/addreviews`, newReview);
+      setReviews([...reviews, response.data.review]);
+      toast.success('Review added successfully');
+    } catch (error) {
+      toast.error('Error adding review');
+    }
+  };
 
   if (!hotel || !mapData) {
     return (
@@ -310,6 +324,12 @@ const HotelDetails = () => {
             >
               Services
             </button>
+            <button
+              className={`py-3 px-6 font-semibold text-lg ${activeTab === 'reviews' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`}
+              onClick={() => setActiveTab('reviews')}
+            >
+              Reviews
+            </button>
           </div>
 
           {activeTab === 'rooms' && (
@@ -320,7 +340,13 @@ const HotelDetails = () => {
                     <div key={index} className="bg-white shadow-lg rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-105">
                       <div className="p-6">
                         <h3 className="text-2xl font-semibold mb-3">{room.type}</h3>
-                        <p className="text-gray-600 mb-4">{room.description}</p>
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="flex items-center text-gray-600">
+                            <BedDouble className="w-5 h-5 mr-2" />
+                            <span>{room.number} Rooms available</span>
+                          </div>
+                        </div>
+                        
                         <div className="flex justify-between items-center mb-4">
                           <div className="flex items-center text-gray-600">
                             <Users className="w-5 h-5 mr-2" />
@@ -368,6 +394,13 @@ const HotelDetails = () => {
                 </div>
               ))}
             </div>
+          )}
+           {activeTab === 'reviews' && (
+            <ReviewComponent
+              hotelId={id}
+              reviews={reviews}
+              onAddReview={handleAddReview}
+            />
           )}
         </div>
       </div>

@@ -156,6 +156,16 @@ class HotelService {
   async updateListingStatus(hotelId, isListed) {
     return await hotelRepository.updateListingStatus(hotelId, isListed);
   }
+
+  async fetchHotelReviews   (hotelId)  {
+    try {
+      const reviews = await hotelRepository.getReviewsByHotelId(hotelId);
+      return reviews;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+  
 }
 
 module.exports = new HotelService();
