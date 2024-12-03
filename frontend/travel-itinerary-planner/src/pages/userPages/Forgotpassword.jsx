@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import api from '../../services/api';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import {
+  sendResetPasswordEmail,
+  verifyOtp,
+  resetPassword,
+} from '../../services/authService';
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(1);
@@ -11,15 +15,16 @@ const ForgotPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
+
   // Handle email submission
   const handleSubmitEmail = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/users/forgot-password', { email });
+      const res = await sendResetPasswordEmail(email);
       toast.success(res.data.message);
       setStep(2); // Move to OTP step
     } catch (err) {
-      toast.error(err.response.data.message);
+      toast.error(err.response?.data?.message || 'Failed to send OTP');
     }
   };
 
@@ -27,11 +32,11 @@ const ForgotPassword = () => {
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/users/verify-otp-password-reset', { email, otp });
+      const res = await verifyOtp(email, otp);
       toast.success(res.data.message);
       setStep(3); // Move to password reset step
     } catch (err) {
-      toast.error(err.response.data.message);
+      toast.error(err.response?.data?.message || 'Failed to verify OTP');
     }
   };
 
@@ -43,18 +48,17 @@ const ForgotPassword = () => {
       return;
     }
     try {
-      const res = await api.post('/users/reset-password', { email, newPassword });
+      const res = await resetPassword(email, newPassword);
       toast.success(res.data.message);
-      setStep(1); // Reset to initial state
+      setStep(1); 
       navigate('/login');
     } catch (err) {
-      toast.error(err.response.data.message);
+      toast.error(err.response?.data?.message || 'Failed to reset password');
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
-      <ToastContainer />
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
         {step === 1 && (
           <form onSubmit={handleSubmitEmail}>

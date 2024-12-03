@@ -6,7 +6,7 @@ export default function FeaturedHotels({ hotels }) {
   const navigate = useNavigate()
   const [currentPage, setCurrentPage] = useState(1)
   const hotelsPerPage = 3
-
+   console.log(hotels,'jhsdh')
   if (hotels.length === 0) return <p className="text-[#00246B]">No hotels to display</p>
 
   const handleNavigate = (id) => {

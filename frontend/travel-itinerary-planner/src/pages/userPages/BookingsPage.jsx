@@ -4,7 +4,7 @@ import { Calendar, DollarSign, Hotel, Loader2, QrCode, AlertTriangle } from 'luc
 import Navigation from '../../components/User/Navigation'
 import StickyNavbar from '../../components/User/Navbar'
 import Swal from 'sweetalert2'
-import api from '../../services/api'
+import { getBookings, cancelBooking } from '../../services/bookingService';
 import { QRCodeSVG } from 'qrcode.react'
 
 const BookingsPage = () => {
@@ -15,28 +15,22 @@ const BookingsPage = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem('token');
         if (!token) {
-          toast.error('User not authenticated')
-          return
+          toast.error('User not authenticated');
+          return;
         }
-        const response = await api.get('/users/bookings', {
-          headers: {
-            Authorization: `${token}`,
-          },
-        })
-        setBookings(response.data.bookings)
-        console.log(response.data.bookings)
+        const bookingsData = await getBookings(token);
+        setBookings(bookingsData);
       } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to load bookings')
+        toast.error(error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchBookings()
-  }, [])
-
+    fetchBookings();
+  }, []);
   const handleLogout = () => {
     localStorage.removeItem('token')
     toast.success('Logged out successfully')
@@ -78,21 +72,16 @@ const BookingsPage = () => {
 
     if (result.isConfirmed) {
       try {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem('token');
         if (!token) {
-          toast.error('User not authenticated')
-          return
+          toast.error('User not authenticated');
+          return;
         }
-        await api.delete(`/users/bookings/${booking._id}/cancel`, {
-          headers: {
-            Authorization: ` ${token}`,
-          },
-          data: { cancellationFee },
-        })
-        setBookings((prevBookings) => prevBookings.filter((b) => b._id !== booking._id))
-        Swal.fire('Cancelled!', 'Your booking has been cancelled.', 'success')
+        await cancelBooking(booking._id, token, cancellationFee);
+        setBookings((prevBookings) => prevBookings.filter((b) => b._id !== booking._id));
+        Swal.fire('Cancelled!', 'Your booking has been cancelled.', 'success');
       } catch (error) {
-        Swal.fire('Error!', error.response?.data?.message || 'Failed to cancel booking', 'error')
+        Swal.fire('Error!', error, 'error');
       }
     }
   }

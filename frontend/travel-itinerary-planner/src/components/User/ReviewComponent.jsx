@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Star } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
 
 const ReviewComponent = ({ hotelId, reviews, onAddReview }) => {
   const [newReview, setNewReview] = useState({ rating: 0, comment: '' });
-  console.log(reviews,'hasdh')
   const handleRatingChange = (rating) => {
     setNewReview((prev) => ({ ...prev, rating }));
   };
@@ -15,16 +16,14 @@ const ReviewComponent = ({ hotelId, reviews, onAddReview }) => {
   const handleSubmitReview = (e) => {
     e.preventDefault();
     if (newReview.rating === 0) {
-      alert('Please select a rating');
+      toast.error('Please select a rating');
       return;
     }
     onAddReview({
-      userName: 'Anonymous', // Replace with actual user name if available
-      ...newReview,
+  ...newReview,
     });
     setNewReview({ rating: 0, comment: '' });
   };
-
   return (
     <div className="bg-white shadow-lg rounded-2xl p-6 mt-8">
       <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
@@ -40,9 +39,8 @@ const ReviewComponent = ({ hotelId, reviews, onAddReview }) => {
                   key={star}
                   type="button"
                   onClick={() => handleRatingChange(star)}
-                  className={`mr-1 ${
-                    star <= newReview.rating ? 'text-yellow-400' : 'text-gray-300'
-                  }`}
+                  className={`mr-1 ${star <= newReview.rating ? 'text-yellow-400' : 'text-gray-300'
+                    }`}
                 >
                   <Star className="w-6 h-6 fill-current" />
                 </button>
@@ -73,30 +71,29 @@ const ReviewComponent = ({ hotelId, reviews, onAddReview }) => {
           </button>
         </form>
       </div>
-      <div className="space-y-4">
+      < div className="space-y-4">
         {reviews.length > 0 ? (
           reviews.map((review) => (
             <div key={review._id} className="border-b pb-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="font-semibold">
-                  {review.userName || 'Anonymous'}
+                  {review.userId.name || 'Anonymous'}
                 </span>
                 <div className="flex items-center">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      className={`w-4 h-4 ${
-                        star <= review.rating
-                          ? 'text-yellow-400 fill-current'
-                          : 'text-gray-300'
-                      }`}
+                      className={`w-4 h-4 ${star <= review.rating
+                        ? 'text-yellow-400 fill-current'
+                        : 'text-gray-300'
+                        }`}
                     />
                   ))}
                 </div>
               </div>
               <p className="text-gray-600">{review.comment}</p>
               <span className="text-sm text-gray-500">
-                {new Date(review.createdAt).toLocaleDateString()}
+                {new Date(review?.createdAt).toLocaleDateString()}
               </span>
             </div>
           ))
@@ -104,7 +101,7 @@ const ReviewComponent = ({ hotelId, reviews, onAddReview }) => {
           <p>No reviews available yet. Be the first to add one!</p>
         )}
       </div>
-    </div>
+    </div >
   );
 };
 

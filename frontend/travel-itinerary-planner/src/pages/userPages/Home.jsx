@@ -29,6 +29,7 @@ export default function Dashboard() {
     const fetchFeaturedHotels = async () => {
       try {
         const response = await api.get('/users/hotels');
+        console.log(response,'ghjg')
         setFeaturedHotels(response.data.data);
       } catch (err) {
         console.error('Error fetching featured hotels:', err);
@@ -71,14 +72,14 @@ export default function Dashboard() {
       <HeroSection onSearch={handleSearch} location={location} />
 
       <FeaturedHotels hotels={searchActive ? searchedHotels : featuredHotels} />
-      <Carousel
+      {/* <Carousel
        hotels={featuredHotels}
         currentSlide={currentSlide}
         nextSlide={nextSlide}
         prevSlide={prevSlide}
         setCurrentSlide={setCurrentSlide}
         totalSlides={totalSlides}
-      />
+      /> */}
       <FeaturesSection />
       <Footer />
     </div>

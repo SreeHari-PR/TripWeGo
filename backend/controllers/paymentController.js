@@ -19,6 +19,7 @@ async createOrder(req, res) {
     const { paymentId, orderId, signature, hotelId, roomTypes,checkInDate, checkOutDate,amount} = req.body;
     console.log('verifypayment',req.body)
     const userId = req.user._id; 
+    
    
     console.log('Received userId:', userId);  
     console.log('Received amount:', amount); 
@@ -34,6 +35,7 @@ async createOrder(req, res) {
         checkOutDate,
         amount,
       };
+  
       console.log(bookingDetails,'jhkkjjkhj')
       const booking = await PaymentService.verifyPayment(paymentId, orderId, signature, bookingDetails,amount);
       return res.status(200).json({ message: 'Payment successful, booking confirmed', booking });

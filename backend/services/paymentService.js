@@ -21,7 +21,9 @@ class PaymentService {
 
   async verifyPayment(paymentId, orderId, signature, bookingDetails,amount) {
     const isValidSignature = await PaymentRepository.verifySignature(paymentId, orderId, signature);
+
     console.log(bookingDetails,'bookingdetails')
+    
     if (!isValidSignature) {
       throw new Error('Invalid payment signature');
     }

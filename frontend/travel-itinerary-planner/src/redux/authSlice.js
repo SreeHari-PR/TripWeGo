@@ -7,6 +7,7 @@ import api from '../services/api';
 export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
   try {
     const response = await api.post('/users/login', credentials);
+    console.log(response,'user')
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -98,7 +99,10 @@ const authSlice = createSlice({
       state.token = null;
       state.isLoggedIn = false;
       state.user = null;
+      localStorage.removeItem('token')
+      localStorage.removeItem('refreshToken')
       toast.success('Logout successful!');
+      window.location.href = '/login';
     },
   },
   extraReducers: (builder) => {
@@ -110,10 +114,10 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload.token;
-        console.log(action.payload,'payload')
         state.user = action.payload.user;
         state.isLoggedIn = true;
         localStorage.setItem('token', action.payload.token);
+        localStorage.setItem('refreshToken',action.payload.user.refreshToken)
         toast.success('Login successful!');
       })
       .addCase(login.rejected, (state, action) => {

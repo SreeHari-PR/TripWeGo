@@ -165,7 +165,8 @@ class HotelController {
         }
         async addReview(req, res) {
           const { hotelId } = req.params;
-          const { userId, rating, comment } = req.body;
+          const {rating, comment } = req.body;
+          const userId=req.user._id
         
           try {
             if (!rating || rating < 0 || rating > 5) {

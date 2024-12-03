@@ -9,7 +9,7 @@ const bookingController = require('../controllers/bookingController');
 const walletController=require('../controllers/walletController')
 const categoryController=require('../controllers/categoryController')
 const OlaMapsController = require('../controllers/OlaMapsContoller');
-
+const refreshMiddleware = require('../middlewares/refreshMiddleware');
 
 
 
@@ -28,6 +28,9 @@ router.post('/resetpassword', authMiddleware, userController.userresetPassword);
 router.put('/profile', authMiddleware, userController.editProfile);
 router.post('/upload-profile-picture', authMiddleware, userController.uploadProfilePictureHandler);
 
+
+//refreshToken
+router.post('/users/refresh-token', refreshMiddleware);
 
 //hotels
 router.get('/hotels', hotelController.listAllHotels);

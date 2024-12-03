@@ -81,7 +81,7 @@ class ManagerRepository {
               date: new Date(),
               description: 'Balance deduction',
               amount: amount,
-              transactioType: 'debit'
+              transactionType: 'debit'
           };
   
           return await Manager.findByIdAndUpdate(

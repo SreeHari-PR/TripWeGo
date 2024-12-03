@@ -109,12 +109,15 @@ const loginUser = async (email, password) => {
 
         const token = user.generateAuthToken();
         const refreshToken = user.generateRefreshToken();
+        console.log('refreshtoken',refreshToken)
 
         user.refreshToken = refreshToken;
-        await user.save();
+
+       await user.save();
 
         return {
             token,
+            
             user: {
                 _id: user._id,
                 name: user.name,
@@ -122,6 +125,7 @@ const loginUser = async (email, password) => {
                 isAdmin: user.isAdmin,
                 isBlocked: user.isBlocked,
                 verified: user.verified,
+                refreshToken:user.refreshToken
             },
         };
     } catch (error) {

@@ -67,7 +67,7 @@ class HotelRepository {
 
   async getHotelById(hotelId) {
     try {
-      const hotel = await Hotel.findById(hotelId).populate('services');
+      const hotel = await Hotel.findById(hotelId).populate('services').populate('reviews.userId','name');
       if (!hotel) {
         throw new Error('Hotel not found');
       }

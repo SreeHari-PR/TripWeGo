@@ -1,10 +1,49 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Users, Calendar, Hotel, DollarSign } from 'lucide-react'
 import { Sidebar } from '../../components/Manager/ManagerSidebar'
 import { Navbar } from '../../components/Manager/ManagerNavbar'
-
+import api from '../../services/api'
+import BookingsChart from '../../components/Manager/BookingsChart'
+import RevenueBarChart from '../../components/Manager/RevenueBarChart'
 export default function ManagerDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchManagerBookings = async () => {
+      try {
+        const manager = JSON.parse(localStorage.getItem('managerData'));
+        const managerId = manager?._id;
+
+        if (!managerId) {
+          toast.error('Manager not found. Please log in.');
+          setLoading(false);
+          return;
+        }
+
+        const response = await api.get(`/manager/bookings/${managerId}`);
+        const allBookings = response.data.bookings;
+
+        
+        const recentBookings = allBookings
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 5);
+
+        setBookings(recentBookings);
+        setLoading(false);
+      } catch (error) {
+        toast.error('Error fetching bookings');
+        setLoading(false);
+      }
+    };
+
+    fetchManagerBookings();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -58,47 +97,55 @@ export default function ManagerDashboard() {
 
             {/* Charts and Tables */}
             <div className="grid gap-6 mb-8 md:grid-cols-2">
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-semibold mb-4 text-[#002233]">Booking Trends</h2>
-                <div className="h-64 bg-gray-200 rounded flex items-center justify-center">
-                  <span className="text-[#002233]">Chart Placeholder</span>
-                </div>
-              </div>
+
+
+
+              <BookingsChart bookings={bookings} />
+              <RevenueBarChart/>
+             </div>
+
+
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4 text-[#002233]">Recent Bookings</h2>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left text-gray-500">
-                    <thead className="text-xs uppercase bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-6 py-3 text-[#002233]">Guest Name</th>
-                        <th scope="col" className="px-6 py-3 text-[#002233]">Room</th>
-                        <th scope="col" className="px-6 py-3 text-[#002233]">Check-in</th>
-                        <th scope="col" className="px-6 py-3 text-[#002233]">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="bg-white border-b">
-                        <td className="px-6 py-4">John Doe</td>
-                        <td className="px-6 py-4">101</td>
-                        <td className="px-6 py-4">2023-09-23</td>
-                        <td className="px-6 py-4">
-                          <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Confirmed</span>
-                        </td>
-                      </tr>
-                      <tr className="bg-white border-b">
-                        <td className="px-6 py-4">Jane Smith</td>
-                        <td className="px-6 py-4">205</td>
-                        <td className="px-6 py-4">2023-09-24</td>
-                        <td className="px-6 py-4">
-                          <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">Pending</span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                {loading ? (
+                  <p>Loading...</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left text-gray-500">
+                      <thead className="text-xs uppercase bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-[#002233]">Hotel Name</th>
+                          <th scope="col" className="px-6 py-3 text-[#002233]">Room</th>
+                          <th scope="col" className="px-6 py-3 text-[#002233]">Check-in</th>
+                          <th scope="col" className="px-6 py-3 text-[#002233]">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {bookings.map((booking) => (
+                          <tr key={booking._id} className="bg-white border-b">
+                            <td className="px-6 py-4">{booking.hotelId.name}</td>
+                            <td className="px-6 py-4">{booking.roomTypes.join(', ')}</td>
+                            <td className="px-6 py-4">
+                              {new Date(booking.checkInDate).toLocaleDateString()}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span
+                                className={`text-xs font-medium px-2.5 py-0.5 rounded ${booking.cancelled
+                                    ? 'bg-red-100 text-red-800'
+                                    : 'bg-green-100 text-green-800'
+                                  }`}
+                              >
+                                {booking.cancelled ? 'Cancelled' : booking.paymentStatus}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
         </main>
       </div>
     </div>
