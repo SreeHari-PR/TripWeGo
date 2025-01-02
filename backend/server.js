@@ -59,9 +59,11 @@ configSocketIO(server);
 app.use(morgan('dev')); // Add Morgan middleware for logging
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(cors({
-    origin: 'http://localhost:5173,https://trip-we-go.vercel.app/'
+    origin: ['http://localhost:5173', 'https://trip-we-go.vercel.app']
 }));
+
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
