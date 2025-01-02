@@ -71,5 +71,5 @@ router.get('/hotels', authMiddleware, hotelController.listAllHotels);
 
 // Bookings
 router.get('/bookings', authMiddleware, bookingController.getBookings);
-
+router.get('/dashboard',authMiddleware, adminController.getDashboardData);
 module.exports = router;

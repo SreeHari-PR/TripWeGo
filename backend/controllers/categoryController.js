@@ -1,5 +1,5 @@
 const categoryService = require('../services/categoryService');
-
+const HttpStatusCodes=require('../utils/httpStatusCodes')
 class CategoryController {
     async addCategory(req, res) {
         try {
@@ -10,7 +10,7 @@ class CategoryController {
                 data: category
             });
         } catch (error) {
-            res.status(400).json({
+            res.status(HttpStatusCodes.BAD_REQUEST).json({
                 success: false,
                 message: error.message
             });
@@ -20,12 +20,12 @@ class CategoryController {
     async getCategories(req, res) {
         try {
             const categories = await categoryService.getAllCategories();
-            res.status(200).json({
+            res.status(HttpStatusCodes.OK).json({
                 success: true,
                 data: categories
             });
         } catch (error) {
-            res.status(400).json({
+            res.status(HttpStatusCodes.BAD_REQUEST).json({
                 success: false,
                 message: error.message
             });
@@ -35,12 +35,12 @@ class CategoryController {
     async deleteCategory(req, res) {
         try {
             await categoryService.deleteCategory(req.params.id);
-            res.status(200).json({
+            res.status(HttpStatusCodes.OK).json({
                 success: true,
                 message: 'Category deleted successfully'
             });
         } catch (error) {
-            res.status(400).json({
+            res.status(HttpStatusCodes.BAD_REQUEST).json({
                 success: false,
                 message: error.message
             });

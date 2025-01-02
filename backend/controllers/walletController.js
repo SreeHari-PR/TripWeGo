@@ -1,14 +1,15 @@
 // src/controllers/walletController.js
 const WalletService = require('../services/walletService');
+const HttpStatusCodes=require('../utils/httpStatusCodes')
 
 class WalletController {
     async getBalance(req, res) {
         const userId = req.user._id;
         try {
           const { balance, transactions } = await WalletService.getBalance(userId);
-          res.status(200).json({ balance, transactions });
+          res.status(HttpStatusCodes.OK).json({ balance, transactions });
         } catch (error) {
-          res.status(500).json({ message: error.message });
+          res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
         }
       }
 
@@ -17,12 +18,12 @@ class WalletController {
     const { amount } = req.body;
     try {
       const updatedUser = await WalletService.addFunds(userId, amount);
-      res.status(200).json({
+      res.status(HttpStatusCodes.OK).json({
         message: 'Funds added',
         balance: updatedUser.walletBalance,
       });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
   }
 
@@ -31,12 +32,12 @@ class WalletController {
     const { amount } = req.body;
     try {
       const updatedUser = await WalletService.deductFunds(userId, amount);
-      res.status(200).json({
+      res.status(HttpStatusCodes.OK).json({
         message: 'Funds deducted',
         balance: updatedUser.walletBalance,
       });
     } catch (error) {
-      res.status(400).json({ message: error.message });
+      res.status(HttpStatusCodes.BAD_REQUEST).json({ message: error.message });
     }
   }
 }

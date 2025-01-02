@@ -8,7 +8,7 @@ exports.autocomplete = async (req, res) => {
     const data = await olaMapsService.autocompleteLocation(query);
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 };
 
@@ -18,7 +18,7 @@ exports.reverseGeocode = async (req, res) => {
     const data = await olaMapsService.reverseGeocodeLocation(lat, lng);
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 };
 
@@ -28,6 +28,6 @@ exports.getDirections = async (req, res) => {
     const data = await olaMapsService.getDirections(origin, destination);
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 };

@@ -7,7 +7,10 @@ const bookingRepository = {
     async getBookingsByUserId(userId) {
         try {
             return await Booking.find({ userId, cancelled: false })
-                .populate('hotelId')
+            .populate({
+                path: 'hotelId',
+                populate: { path: 'managerId', model: 'Manager' },
+              })
                 .sort({ createdAt: -1 });
         } catch (error) {
             console.error("Error fetching bookings by user ID:", error);
@@ -22,6 +25,7 @@ const bookingRepository = {
                 hotelId: { $in: hotelIds }
             })
                 .populate('hotelId')
+                .populate('userId', 'name email')
                 .sort({ createdAt: -1 });
         } catch (error) {
             console.error("Error fetching bookings by manager ID:", error);
@@ -41,7 +45,7 @@ const bookingRepository = {
 
     async getBookingById(bookingId) {
         try {
-            return await Booking.findById(bookingId).populate('hotelId');
+            return await Booking.findById(bookingId).populate('hotelId').populate('userId');
         } catch (error) {
             console.error("Error fetching booking by ID:", error);
             throw error;

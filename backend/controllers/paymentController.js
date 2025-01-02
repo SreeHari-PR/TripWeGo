@@ -1,5 +1,6 @@
 // src/controllers/PaymentController.js
 const PaymentService = require('../services/paymentService');
+const HttpStatusCodes=require('../utils/httpStatusCodes')
 
 class PaymentController {
   // src/controllers/PaymentController.js
@@ -8,9 +9,9 @@ async createOrder(req, res) {
   console.log('Amount in rupees:', amount);
   try {
     const order = await PaymentService.createOrder(hotelId, amount);
-    return res.status(200).json({ order });
+    return res.status(HttpStatusCodes.OK).json({ order });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
   }
 }
 
@@ -38,9 +39,9 @@ async createOrder(req, res) {
   
       console.log(bookingDetails,'jhkkjjkhj')
       const booking = await PaymentService.verifyPayment(paymentId, orderId, signature, bookingDetails,amount);
-      return res.status(200).json({ message: 'Payment successful, booking confirmed', booking });
+      return res.status(HttpStatusCodes.OK).json({ message: 'Payment successful, booking confirmed', booking });
     } catch (error) {
-      return res.status(400).json({ message: error.message });
+      return res.status(HttpStatusCodes.BAD_REQUEST).json({ message: error.message });
     }
   }
 }

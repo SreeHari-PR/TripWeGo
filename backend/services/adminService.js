@@ -3,6 +3,7 @@
 const userRepository = require('../repositories/userRepository');
 const managerRepository=require('../repositories/managerRepository')
 const walletRepository=require('../repositories/walletRepository')
+const adminRepository=require('../repositories/adminRepository')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -76,6 +77,16 @@ class AdminService {
             transactions: admin.transactions
         };
     }
+    async fetchAdminDashboardData() {
+        try {
+          const data = await adminRepository.getAdminDashboardData();
+          console.log(data,'djhsd')
+          return data;
+        } catch (error) {
+            console.log(error)
+          throw new Error(error.message);
+        }
+      }
 }
 
 module.exports = new AdminService();

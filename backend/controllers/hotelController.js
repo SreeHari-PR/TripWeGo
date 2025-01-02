@@ -1,6 +1,7 @@
 // src/controllers/hotelController.js
 const hotelService = require('../services/hotelService');
 const hotelRepository=require('../repositories/hotelRepository')
+const HttpStatusCodes=require('../utils/httpStatusCodes')
 
 class HotelController {
 
@@ -24,7 +25,7 @@ class HotelController {
             hotel 
         });
     } catch (error) {
-        return res.status(400).json({ 
+        return res.status(HttpStatusCodes.BAD_REQUEST).json({ 
             success: false, 
             message: error.message 
         });
@@ -40,12 +41,12 @@ class HotelController {
               
               console.log('Hotels found:', hotels); 
               
-              res.status(200).json({
+              res.status(HttpStatusCodes.OK).json({
                 success: true,
                 hotels
               });
             } catch (error) {
-              res.status(500).json({
+              res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: 'Error retrieving hotels',
                 error: error.message
@@ -55,13 +56,13 @@ class HotelController {
           async listAllHotels(req, res) {
             try {
               const hotels = await hotelService.getAllHotels();
-              return res.status(200).json({
+              return res.status(HttpStatusCodes.OK).json({
                 success: true,
                 data: hotels,
               });
             } catch (error) {
               console.error('Error in listAllHotels:', error);
-              return res.status(500).json({
+              return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: 'Internal server error',
               });
@@ -77,9 +78,9 @@ class HotelController {
                     checkOutDate: checkOutDate || undefined,
                     guestCount: guestCount ? parseInt(guestCount, 10) : undefined
                 });
-                return res.status(200).json(hotels);
+                return res.status(HttpStatusCodes.OK).json(hotels);
             } catch (error) {
-                return res.status(500).json({ error: error.message });
+                return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
             }
         }
           async getHotel(req, res) {
@@ -91,7 +92,7 @@ class HotelController {
                 const hotel = await hotelService.getSingleHotelPage(hotelId);
                 const serviceNames = hotel.services.map(service => service.name);
                 console.log(serviceNames)
-                res.status(200).json({
+                res.status(HttpStatusCodes.OK).json({
                     success: true,
                     hotel: {
                       ...hotel.toObject(),
@@ -99,7 +100,7 @@ class HotelController {
                     }
                 });
             } catch (error) {
-                res.status(400).json({
+                res.status(HttpStatusCodes.BAD_REQUEST).json({
                     success: false,
                     message: error.message
                 });
@@ -113,13 +114,13 @@ class HotelController {
             const hotelData = req.body;
             const updatedHotel = await hotelService.editHotel(hotelId, hotelData);
       
-            return res.status(200).json({
+            return res.status(HttpStatusCodes.OK).json({
               success: true,
               message: 'Hotel updated successfully',
               hotel: updatedHotel
             });
           } catch (error) {
-            return res.status(400).json({
+            return res.status(HttpStatusCodes.BAD_REQUEST).json({
               success: false,
               message: error.message
             });
@@ -132,13 +133,13 @@ class HotelController {
             const hotelId = req.params.id;
             const listedHotel = await hotelService.updateListingStatus(hotelId, true);
       
-            return res.status(200).json({
+            return res.status(HttpStatusCodes.OK).json({
               success: true,
               message: 'Hotel listed successfully',
               hotel: listedHotel
             });
           } catch (error) {
-            return res.status(400).json({
+            return res.status(HttpStatusCodes.BAD_REQUEST).json({
               success: false,
               message: error.message
             });
@@ -151,13 +152,13 @@ class HotelController {
             const hotelId = req.params.id;
             const unlistedHotel = await hotelService.updateListingStatus(hotelId, false);
       
-            return res.status(200).json({
+            return res.status(HttpStatusCodes.OK).json({
               success: true,
               message: 'Hotel unlisted successfully',
               hotel: unlistedHotel
             });
           } catch (error) {
-            return res.status(400).json({
+            return res.status(HttpStatusCodes.BAD_REQUEST).json({
               success: false,
               message: error.message
             });
@@ -170,15 +171,15 @@ class HotelController {
         
           try {
             if (!rating || rating < 0 || rating > 5) {
-              return res.status(400).json({ message: 'Rating must be between 0 and 5' });
+              return res.status(HttpStatusCodes.BAD_REQUEST).json({ message: 'Rating must be between 0 and 5' });
             }
         
             const response = await hotelRepository.addReviewToHotel(hotelId, userId, rating, comment);
         
-            return res.status(200).json(response);
+            return res.status(HttpStatusCodes.OK).json(response);
           } catch (error) {
             console.error('Error adding review:', error);
-            return res.status(500).json({ message: error.message });
+            return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
           }
         };
         async  getHotelReviews (req, res){
@@ -186,9 +187,9 @@ class HotelController {
         
           try {
             const reviews = await hotelService.fetchHotelReviews(hotelId);
-            res.status(200).json({ success: true, reviews });
+            res.status(HttpStatusCodes.OK).json({ success: true, reviews });
           } catch (error) {
-            res.status(400).json({ success: false, message: error.message });
+            res.status(HttpStatusCodes.BAD_REQUEST).json({ success: false, message: error.message });
           }
         };
           

@@ -3,6 +3,7 @@ const router = express.Router();
 const managerController = require('../controllers/managerController');
 const bookingController = require('../controllers/bookingController');
 const hotelController = require('../controllers/hotelController');
+const chatController=require('../controllers/chatController')
 const authMiddleware = require('../middlewares/authMiddleware');
 
 // Manager Management
@@ -28,6 +29,15 @@ router.get('/bookings/:managerId', authMiddleware, bookingController.listManager
 
 // Wallet Management
 router.get('/wallet-transactions/:managerId', authMiddleware, managerController.getManagerWalletAndTransactions);
+
+
+//chat
+
+
+router.post('/send', authMiddleware, chatController.sendMessage);
+router.get('/rooms', authMiddleware, chatController.getChatRooms);
+router.get('/chats/:bookingId', authMiddleware, chatController.getMessages);
+
 
 module.exports = router;
 

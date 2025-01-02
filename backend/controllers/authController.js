@@ -3,7 +3,7 @@ const { verifyGoogleToken } = require('../services/googleAuthService');
 const { findUserByEmail, createUser } = require('../repositories/userRepository');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-
+const HttpStatusCodes=require('../utils/httpStatusCodes')
 
 const generateRandomPassword = () => {
     return crypto.randomBytes(16).toString('hex');
@@ -28,7 +28,7 @@ const googleLoginController = async (req, res) => {
             expiresIn: '1h',
         });
 
-        return res.status(200).json({
+        return res.status(HttpStatusCodes.OK).json({
             user: {
                 email: user.email,
                 name: user.name,

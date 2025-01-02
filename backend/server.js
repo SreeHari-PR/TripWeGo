@@ -38,10 +38,12 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
+const server = require('http').createServer(app);
 const cors = require('cors');
 const morgan = require('morgan'); // Import Morgan
 const path = require('path');
 const connection = require('./db');
+const {configSocketIO} =require('./utils/socket_config');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -49,6 +51,9 @@ const managerRoutes = require('./routes/managerRoutes');
 
 // Database connection
 connection();
+// Configure Socket.IO
+configSocketIO(server);
+
 
 // Middlewares
 app.use(morgan('dev')); // Add Morgan middleware for logging
@@ -69,6 +74,6 @@ app.use('/api/manager', managerRoutes);
 // Server setup
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server is listening on port ${port}`);
 });

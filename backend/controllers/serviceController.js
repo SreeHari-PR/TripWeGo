@@ -1,4 +1,5 @@
 const serviceService = require('../services/serviceService');
+const HttpStatusCodes=require('../utils/httpStatusCodes')
 
 const createService = async (req, res) => {
     try {
@@ -12,7 +13,7 @@ const createService = async (req, res) => {
             service
         });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
 
@@ -20,9 +21,9 @@ const getAllServices = async (req, res) => {
     try {
         // Call the service layer to fetch services
         const services = await serviceService.getAllServices();
-        return res.status(200).json({ services });
+        return res.status(HttpStatusCodes.OK).json({ services });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
 

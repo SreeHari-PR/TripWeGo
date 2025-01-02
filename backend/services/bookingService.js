@@ -8,6 +8,8 @@ const bookingService = {
     async listUserBookings(userId) {
         try {
           const bookings = await bookingRepository.getBookingsByUserId(userId);
+          console.log(bookings,'jjjjjj');
+          
           return bookings;
         } catch (error) {
           throw error;
