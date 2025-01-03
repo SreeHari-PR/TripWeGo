@@ -99,41 +99,52 @@ const HotelDetails = () => {
   const handleBookNow = async () => {
     try {
       const [checkIn, checkOut] = dateRange;
-
+  
       if (!checkIn || !checkOut) {
         toast.error('Please select check-in and check-out dates');
         return;
       }
-
+  
       if (checkOut <= checkIn) {
         toast.error('Check-out date should be after check-in date');
         return;
       }
+  
       const selectedRoomTypes = Object.keys(selectedRooms).filter(
         (roomType) => selectedRooms[roomType]
       );
-
+  
       if (selectedRoomTypes.length === 0) {
         toast.error('Please select at least one room type');
         return;
       }
-
+  
+      // Calculate the number of days
+      const oneDay = 24 * 60 * 60 * 1000; // Milliseconds in a day
+      const numberOfDays = Math.round((checkOut - checkIn) / oneDay);
+  
+      if (numberOfDays <= 0) {
+        toast.error('Invalid date range');
+        return;
+      }
+  
+      // Calculate the total amount
       const totalAmount = selectedRoomTypes.reduce((total, roomType) => {
         const room = hotel.roomTypes.find((r) => r.type === roomType);
-        return total + (room ? room.price : 0);
+        return total + (room ? room.price * numberOfDays : 0);
       }, 0);
-
+  
       const orderData = {
-        amount: totalAmount * 100,
+        amount: totalAmount * 100, // Convert to paisa for Razorpay
         currency: 'INR',
         hotelId: hotel._id,
         roomTypes: selectedRoomTypes,
         checkIn: checkIn.toISOString(),
         checkOut: checkOut.toISOString(),
       };
-
+  
       const order = await hotelService.createOrder(orderData);
-
+  
       const options = {
         key: "rzp_test_rwud39pugiL6zo",
         amount: order.amount,
@@ -143,7 +154,7 @@ const HotelDetails = () => {
         order_id: order.id,
         handler: async function (response) {
           const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
-
+  
           await hotelService.verifyPayment({
             paymentId: razorpay_payment_id,
             orderId: razorpay_order_id,
@@ -154,7 +165,7 @@ const HotelDetails = () => {
             checkOutDate: checkOut.toISOString(),
             amount: totalAmount,
           });
-
+  
           toast.success('Payment Successful! Booking confirmed.');
           navigate('/bookings');
         },
@@ -164,7 +175,7 @@ const HotelDetails = () => {
           contact: '9876543210',
         },
       };
-
+  
       if (window.Razorpay) {
         const rzp = new window.Razorpay(options);
         rzp.open();
@@ -176,6 +187,7 @@ const HotelDetails = () => {
       toast.error('Failed to initiate payment');
     }
   };
+  
 
   const handleAddReview = async (newReview) => {
     try {

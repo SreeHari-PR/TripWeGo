@@ -8,21 +8,21 @@ const Carousel = () => {
   const banners = [
     {
       id: 'banner1',
-      image: './src/assets/banner2.jpg',
+      image: '/src/assets/banner2.jpg',
       title: 'Summer Special Offer',
       description: 'Get 20% off on all bookings this summer!',
       overlayColor: 'from-blue-900/80',
     },
     {
       id: 'banner2',
-      image: './src/assets/banner3.webp',
+      image: '/src/assets/banner3.webp',
       title: 'Luxury Weekend Getaway',
       description: 'Experience luxury at its finest with our weekend packages',
       overlayColor: 'from-blue-900/80',
     },
     {
       id: 'banner3',
-      image: './src/assets/banner4.jpg',
+      image: '/src/assets/banner4.jpg',
       title: 'Family Fun Package',
       description: 'Kids stay free! Limited time offer for family bookings',
       overlayColor: 'from-blue-900/80',

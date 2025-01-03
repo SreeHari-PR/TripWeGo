@@ -3,11 +3,15 @@ const chatModel = require('../models/chatModel');
 // Function to get chat by managerId, userId, and bookingId
 async function getChat(managerId, userId, bookingId) {
   try {
-    return await chatModel.findOne({ manager: managerId, user: userId, bookingId });
+    return await chatModel
+      .findOne({ manager: managerId, user: userId, bookingId })
+      .populate("manager", "name email profilePicture") // Select specific fields to populate
+      .populate("user", "name email profilePicture");
   } catch (error) {
     throw new Error(`Error in getChat: ${error.message}`);
   }
 }
+
 
 // Function to create a new chat
 async function createChat(managerId, userId, bookingId) {
@@ -75,20 +79,28 @@ async function getChatByBookingId(bookingId) {
 // Function to get chats by userId
 async function getChatsByUserId(userId) {
   try {
-    return await chatModel.find({ user: userId });
+    return await chatModel
+      .find({ user: userId })
+      .populate("manager", "name email profilePicture")
+      .populate("user", "name email profilePicture");
   } catch (error) {
     throw new Error(`Error in getChatsByUserId: ${error.message}`);
   }
 }
 
+
 // Function to get chats by managerId
 async function getChatsByManagerId(managerId) {
   try {
-    return await chatModel.find({ manager: managerId });
+    return await chatModel
+      .find({ manager: managerId })
+      .populate("manager", "name email profilePicture")
+      .populate("user", "name email profilePicture");
   } catch (error) {
     throw new Error(`Error in getChatsByManagerId: ${error.message}`);
   }
 }
+
 
 module.exports = {
   getChat,
