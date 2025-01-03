@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import api from '../../services/api';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +13,7 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/manager/login', { email, password });
+      const response = await api.post('/manager/login', { email, password });
 
       localStorage.setItem('authToken', response.data.data.token);
       localStorage.setItem('managerData', JSON.stringify(response.data.data.manager))
