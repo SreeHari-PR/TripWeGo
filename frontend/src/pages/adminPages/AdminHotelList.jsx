@@ -18,7 +18,7 @@ import {
   DollarSign,
   Check,
 } from 'lucide-react';
-import { fetchHotels, deleteHotel } from '../../services/Admin/hotelService';
+import { fetchHotels as getHotels, deleteHotel } from '../../services/Admin/hotelService';
 import AdminSidebar from '../../components/Admin/Sidebar';
 
 const AdminHotelList = () => {
@@ -31,15 +31,15 @@ const AdminHotelList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchHotels();
+    loadHotels();
   }, [currentPage, searchTerm]);
 
-  const fetchHotels = async () => {
+  const loadHotels = async () => {
     setIsLoading(true);
     try {
-      const data = await fetchHotels(currentPage, searchTerm);
-      setHotels(data);
-      setTotalPages(data.totalPages);
+      const data = await getHotels(currentPage, searchTerm);
+      setHotels(data.data || []);
+      setTotalPages(data.totalPages || 1);
     } catch (error) {
       console.error(error.message);
     } finally {
@@ -56,7 +56,7 @@ const AdminHotelList = () => {
     if (window.confirm('Are you sure you want to delete this hotel?')) {
       try {
         await deleteHotel(hotelId);
-        fetchHotels();
+        loadHotels();
       } catch (error) {
         console.error(error.message);
       }
@@ -78,168 +78,176 @@ const AdminHotelList = () => {
     setCurrentPage(1);
   };
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
     }
   };
 
   return (
     <div className="flex h-screen bg-gray-100">
-    <div className="w-64">
+      <div className="w-64">
         <AdminSidebar />
-    </div>
-    <div className="flex-1 overflow-auto">
-                <div className="container mx-auto px-4 py-8">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-6 flex items-center">Hotel Management</h1>
       </div>
-
-      <div className="mb-4">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search hotels..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+      <div className="flex-1 overflow-auto">
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6 flex items-center">Hotel Management</h1>
         </div>
-      </div>
 
-      {isLoading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      ) : (
-        <>
-          <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-            <table className="min-w-full table-auto">
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Hotel
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Location
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Rating
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {hotels.map((hotel) => (
-                  <tr key={hotel._id} className="hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          {hotel.images && hotel.images.mainImage ? (
-                            <img
-                              className="h-10 w-10 rounded-full object-cover"
-                              src={hotel.images.mainImage}
-                              alt={hotel.name}
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                              <Hotel className="h-6 w-6 text-gray-500" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{hotel.name}</div>
-                          <div className="text-sm text-gray-500">{hotel.type}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <MapPin className="h-4 w-4 text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-900">{hotel.location.city}, {hotel.location.country}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                        <span className="text-sm text-gray-900">{hotel.rating}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleViewDetails(hotel)}
-                        className="text-blue-600 hover:text-blue-900 mr-4"
-                      >
-                        <Eye className="h-5 w-5" />
-                        <span className="sr-only">View Details</span>
-                      </button>
-                      <button
-                        onClick={() => handleEdit(hotel._id)}
-                        className="text-indigo-600 hover:text-indigo-900 mr-4"
-                      >
-                        <Edit className="h-5 w-5" />
-                        <span className="sr-only">Edit</span>
-                      </button>
-                      <button
-                        onClick={() => handleDelete(hotel._id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                        <span className="sr-only">Delete</span>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className="mb-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search hotels..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
           </div>
+        </div>
 
-          <div className="mt-4 flex items-center justify-between">
-            <div className="text-sm text-gray-700">
-              Showing <span className="font-medium">{(currentPage - 1) * 10 + 1}</span> to{' '}
-              <span className="font-medium">{Math.min(currentPage * 10, totalPages * 10)}</span> of{' '}
-              <span className="font-medium">{totalPages * 10}</span> results
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+              <table className="min-w-full table-auto">
+                <thead className="bg-gray-200">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Hotel
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Location
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Rating
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {hotels.map((hotel) => (
+                    <tr key={hotel._id} className="hover:bg-gray-50">
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            {hotel.images?.mainImage ? (
+                              <img
+                                className="h-10 w-10 rounded-full object-cover"
+                                src={hotel.images.mainImage}
+                                alt={hotel.name}
+                              />
+                            ) : (
+                              <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                <Hotel className="h-6 w-6 text-gray-500" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{hotel.name}</div>
+                            <div className="text-sm text-gray-500">{hotel.type}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <MapPin className="h-4 w-4 text-gray-400 mr-2" />
+                          <span className="text-sm text-gray-900">{hotel.location.city}, {hotel.location.country}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                          <span className="text-sm text-gray-900">{hotel.rating}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                        <button
+                          onClick={() => handleViewDetails(hotel)}
+                          className="text-blue-600 hover:text-blue-900 mr-4"
+                        >
+                          <Eye className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleEdit(hotel._id)}
+                          className="text-indigo-600 hover:text-indigo-900 mr-4"
+                        >
+                          <Edit className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(hotel._id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex justify-center items-center mt-4 space-x-2">
               <button
-                onClick={handlePreviousPage}
+                onClick={() => handlePageChange(1)}
                 disabled={currentPage === 1}
                 className={`px-3 py-1 rounded-md ${
-                  currentPage === 1
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                  currentPage === 1 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'
                 }`}
               >
-                <ChevronLeft className="h-5 w-5" />
+                First
               </button>
-              <span className="text-sm text-gray-700">
-                Page {currentPage} of {totalPages}
-              </span>
               <button
-                onClick={handleNextPage}
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded-md ${
+                  currentPage === 1 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
+              >
+                <ChevronLeft size={20} />
+              </button>
+              {[...Array(totalPages)].map((_, index) => {
+                const pageNumber = index + 1;
+                return (
+                  <button
+                    key={pageNumber}
+                    onClick={() => handlePageChange(pageNumber)}
+                    className={`px-3 py-1 rounded-md ${
+                      currentPage === pageNumber ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
                 className={`px-3 py-1 rounded-md ${
-                  currentPage === totalPages
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                  currentPage === totalPages ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'
                 }`}
               >
-                <ChevronRight className="h-5 w-5" />
+                <ChevronRight size={20} />
+              </button>
+              <button
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded-md ${
+                  currentPage === totalPages ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
+              >
+                Last
               </button>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
 
-      {isModalOpen && selectedHotel && (
+{isModalOpen && selectedHotel && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
@@ -321,5 +329,5 @@ const AdminHotelList = () => {
     </div>
   );
 };
-
 export default AdminHotelList;
+
