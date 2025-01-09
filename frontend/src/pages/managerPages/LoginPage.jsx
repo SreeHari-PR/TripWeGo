@@ -30,7 +30,7 @@ const LoginPage = () => {
   return (
     <section
       className="min-h-screen bg-cover bg-center flex items-center justify-center"
-      style={{ backgroundImage: `url(/src/assets/blob-scene-haikei.svg)` }}
+      style={{ backgroundImage: `url(/blob-scene-haikei.svg)` }}
     >
       <div className="container h-full p-10">
         <div className="flex h-full items-center justify-center text-neutral-800">

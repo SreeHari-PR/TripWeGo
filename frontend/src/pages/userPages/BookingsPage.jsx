@@ -1,38 +1,54 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
-import { Calendar, IndianRupee, Hotel, Loader2, QrCode, AlertTriangle } from 'lucide-react'
+import { jsPDF } from 'jspdf'
+import html2canvas from 'html2canvas'
+import { Calendar, IndianRupee, Hotel, Loader2, QrCode, AlertTriangle, Download, ChevronLeft, ChevronRight } from 'lucide-react'
 import Navigation from '../../components/User/Navigation'
 import StickyNavbar from '../../components/User/Navbar'
 import Swal from 'sweetalert2'
 import { getBookings, cancelBooking } from '../../services/User/bookingService'
 import { QRCodeSVG } from 'qrcode.react'
+import BookingReceipt from '../../components/User/BookingReceipt'
 
 const BookingsPage = () => {
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedBooking, setSelectedBooking] = useState(null)
   const navigate = useNavigate()
+  const receiptRefs = useRef({})
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1)
+  const [bookingsPerPage] = useState(3)
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token')
         if (!token) {
-          toast.error('User not authenticated');
-          return;
+          toast.error('User not authenticated')
+          return
         }
-        const bookingsData = await getBookings(token);
-        setBookings(bookingsData);
+        const bookingsData = await getBookings(token)
+        setBookings(bookingsData)
       } catch (error) {
-        toast.error(error);
+        toast.error(error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchBookings();
-  }, []);
+    fetchBookings()
+  }, [])
+
+  // Get current bookings
+  const indexOfLastBooking = currentPage * bookingsPerPage
+  const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage
+  const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking)
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -40,64 +56,39 @@ const BookingsPage = () => {
   }
 
   const handleCancelBooking = async (booking) => {
-    const checkInDate = new Date(booking.checkInDate)
-    const today = new Date()
-    const daysUntilCheckIn = Math.ceil((checkInDate - today) / (1000 * 60 * 60 * 24))
-
-    let cancellationFee = 0
-    let cancellationPolicy = ''
-
-    if (daysUntilCheckIn > 7) {
-      cancellationFee = 0
-      cancellationPolicy = 'Free cancellation'
-    } else if (daysUntilCheckIn > 3) {
-      cancellationFee = booking.amount * 0.5
-      cancellationPolicy = '50% cancellation fee'
-    } else {
-      cancellationFee = booking.amount
-      cancellationPolicy = 'No refund'
-    }
-
-    const result = await Swal.fire({
-      title: 'Cancellation Policy',
-      html: `
-        <p><strong>${cancellationPolicy}</strong></p>
-        <p>Days until check-in: ${daysUntilCheckIn}</p>
-        <p>Cancellation fee: $${cancellationFee.toFixed(2)}</p>
-        <p>Are you sure you want to cancel this booking?</p>
-      `,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, cancel it!',
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: 'btn btn-success',
+        cancelButton: 'btn btn-danger'
+      },
+      buttonsStyling: false
     })
 
-    if (result.isConfirmed) {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          toast.error('User not authenticated');
-          return;
+    swalWithBootstrapButtons.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, cancel it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const token = localStorage.getItem('token')
+          await cancelBooking(booking._id, token)
+          const updatedBookings = bookings.filter((b) => b._id !== booking._id)
+          setBookings(updatedBookings)
+          toast.success('Booking cancelled successfully')
+        } catch (error) {
+          toast.error(error)
         }
-        await cancelBooking(booking._id, token, cancellationFee);
-        setBookings((prevBookings) => prevBookings.filter((b) => b._id !== booking._id));
-        Swal.fire('Cancelled!', 'Your booking has been cancelled.', 'success');
-      } catch (error) {
-        Swal.fire('Error!', error, 'error');
       }
-    }
+    })
   }
 
   const generateQRCodeData = (booking) => {
-    return JSON.stringify({
-      hotelName: booking.hotelId.name,
-      roomTypes: booking.roomTypes,
-      checkIn: new Date(booking.checkInDate).toLocaleDateString(),
-      checkOut: new Date(booking.checkOutDate).toLocaleDateString(),
-      orderId: booking.orderId,
-      paymentStatus: booking.paymentStatus,
-    })
+    return `${booking.orderId}-${booking.paymentId}`
   }
 
   const handleShowQRCode = (booking) => {
@@ -110,6 +101,32 @@ const BookingsPage = () => {
 
   const handleChatNavigation = (bookingId) => {
     navigate(`/chat/${bookingId}`)
+  }
+
+  const handleDownloadReceipt = async (booking) => {
+    const receiptElement = receiptRefs.current[booking._id]
+    if (!receiptElement) {
+      toast.error('Could not generate receipt')
+      return
+    }
+
+    try {
+      receiptElement.style.visibility = 'visible'
+      const canvas = await html2canvas(receiptElement)
+      receiptElement.style.visibility = 'hidden'
+
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF()
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
+      pdf.save(`booking-receipt-${booking.orderId}.pdf`)
+      toast.success('Receipt downloaded successfully')
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      toast.error('Error generating PDF')
+    }
   }
 
   if (loading) {
@@ -142,14 +159,13 @@ const BookingsPage = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                {bookings.map((booking) => (
+                {currentBookings.map((booking) => (
                   <div key={booking._id} className="bg-white overflow-hidden shadow rounded-lg">
                     <div className="px-4 py-5 sm:p-6">
                       <div className="flex items-center justify-between mb-4">
                         <h2 className="text-xl font-semibold text-[#00246B]">{booking.hotelId.name}</h2>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          booking.paymentStatus === 'Paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${booking.paymentStatus === 'Paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
                           {booking.paymentStatus}
                         </span>
                       </div>
@@ -200,7 +216,7 @@ const BookingsPage = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="mt-6 grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <button
                           onClick={() => handleCancelBooking(booking)}
                           className="bg-[#00246B] text-white font-medium py-2 px-4 rounded-md hover:bg-[#001d3d] transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#00246B] focus:ring-opacity-50"
@@ -220,10 +236,45 @@ const BookingsPage = () => {
                         >
                           Chat about booking
                         </button>
+                        <button
+                          onClick={() => handleDownloadReceipt(booking)}
+                          className="bg-white text-[#00246B] font-medium py-2 px-4 rounded-md border border-[#00246B] hover:bg-gray-50 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#00246B] focus:ring-opacity-50"
+                        >
+                          <Download className="inline-block mr-2" />
+                          Download Receipt
+                        </button>
                       </div>
+                    </div>
+                    <div
+                      ref={(el) => (receiptRefs.current[booking._id] = el)}
+                      style={{ visibility: 'hidden', position: 'absolute', zIndex: -1 }}
+                    >
+                      <BookingReceipt booking={booking} />
                     </div>
                   </div>
                 ))}
+                {/* Pagination */}
+                <div className="flex justify-between items-center mt-6">
+                  <button
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-5 h-5 mr-2" />
+                    Previous
+                  </button>
+                  <span className="text-sm text-gray-700">
+                    Page {currentPage} of {Math.ceil(bookings.length / bookingsPerPage)}
+                  </span>
+                  <button
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === Math.ceil(bookings.length / bookingsPerPage)}
+                    className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                    <ChevronRight className="w-5 h-5 ml-2" />
+                  </button>
+                </div>
               </div>
             )}
           </div>

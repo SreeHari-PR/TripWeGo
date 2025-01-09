@@ -41,7 +41,7 @@ const Login = () => {
   return (
     <section
       className="min-h-screen bg-cover bg-center flex items-center justify-center"
-      style={{ backgroundImage: `url(/src/assets/wave-haikei.svg)` }}
+      style={{ backgroundImage: `url(/wave-haikei.svg)` }}
     >
       <motion.div
         initial={{ opacity: 0, y: -50 }}

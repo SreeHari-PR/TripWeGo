@@ -76,7 +76,7 @@ const VerifyOtp = () => {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-gray-100"
-            style={{ backgroundImage: `url(/src/assets/blurry-gradient-haikei.svg)` }}>
+            style={{ backgroundImage: `url(/blurry-gradient-haikei.svg)` }}>
             <div className="w-full max-w-sm p-8 bg-white bg-opacity-80 shadow-md rounded-lg"
                 style={{ backdropFilter: 'blur(100px)' }}>
                 <h2 className="text-2xl font-bold text-center mb-6">Enter OTP</h2>

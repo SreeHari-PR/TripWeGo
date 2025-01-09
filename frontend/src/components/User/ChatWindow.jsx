@@ -13,6 +13,7 @@ const ChatWindow = ({ chat, currentUserId, onSendMessage }) => {
   }, [chat.messages]);
 
   const otherUser = currentUserId === chat.manager ? chat.user : chat.manager;
+  console.log(otherUser,'gfgfg');
 
   // const formatTimestamp = (timestamp) => {
   //   const date = new Date(timestamp);
