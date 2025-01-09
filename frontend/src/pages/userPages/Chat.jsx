@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { format } from 'date-fns';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import api from '../../services/api';
@@ -19,9 +20,11 @@ const UserChat = () => {
       if (!token || !bookingId) return;
 
       const chatResponse = await api.get(`/users/messages/${bookingId}`);
+      console.log(chatResponse.data, 'chatResponse.data');
       setChat(chatResponse.data || null);
 
       const managerResponse = await api.get(`/users/bookings/${bookingId}/manager`);
+      console.log(managerResponse.data, 'managerResponse.data');
       setManager(managerResponse.data || null);
     } catch (error) {
       console.error('Error fetching chat details:', error);
@@ -76,7 +79,11 @@ const UserChat = () => {
   const handleSendMessage = async (content) => {
   if (!content.trim() || !user?._id) return;
 
-  const newMessage = { sender: user._id, content };
+  const newMessage = {
+    sender: user._id,
+    content,
+    timestamp: new Date().toISOString(), 
+  };
 
   try {
     if (chat) {
@@ -100,6 +107,7 @@ const UserChat = () => {
       <ChatWindow
         chat={chat}
         currentUserId={user?._id || ''}
+        otherusername={manager?.name}
         onSendMessage={handleSendMessage}
       />
     </div>
