@@ -10,7 +10,6 @@ const ManagerDetails = () => {
     const fetchManagerDetails = async () => {
       try {
         const response = await api.get(`/admin/managers/${id}`);
-        console.log('manger details',response)
         setManager(response.data);
       } catch (error) {
         console.error('Error fetching manager details:', error);

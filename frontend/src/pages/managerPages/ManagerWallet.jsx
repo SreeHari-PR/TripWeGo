@@ -18,7 +18,6 @@ const ManagerWallet = () => {
         setLoading(true)
         const response = await api.get(`/manager/wallet-transactions/${managerId}`)
         setWalletData(response.data.data)
-        console.log(response.data);
       } catch (err) {
         setError('Failed to fetch wallet and transaction data')
       } finally {

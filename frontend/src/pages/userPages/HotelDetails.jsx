@@ -37,7 +37,6 @@ const HotelDetails = () => {
     setError(null);
     try {
       const hotelData = await hotelService.getHotelDetails(id);
-      console.log(hotelData,'djkahjk')
       setHotel(hotelData);
 
       const reviewsData = await hotelService.getHotelReviews(id);

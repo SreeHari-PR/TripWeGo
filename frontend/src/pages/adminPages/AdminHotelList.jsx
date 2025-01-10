@@ -48,8 +48,7 @@ const AdminHotelList = () => {
   };
 
   const handleEdit = (hotelId) => {
-    // Implement edit functionality
-    console.log('Edit hotel:', hotelId);
+   
   };
 
   const handleDelete = async (hotelId) => {

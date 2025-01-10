@@ -57,7 +57,6 @@ export default function HotelListing() {
     const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(hotel.category);
     const matchesPrice = !hotel.price || (hotel.price >= priceRange.min && hotel.price <= priceRange.max);
     
-    console.log(`Hotel ${hotel.name}: Category: ${hotel.category}, Matches: ${matchesCategory}`);
     
     return matchesSearch && matchesCategory && matchesPrice;
   });

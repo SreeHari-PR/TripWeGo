@@ -51,7 +51,6 @@ const ManagerChat = () => {
   const fetchBookings = async (managerId) => {
     try {
       const response = await api.get(`/manager/bookings/${managerId}`);
-      console.log('Bookings response:', response.data);
       setBookings(response.data.bookings);
     } catch (error) {
       console.error('Error fetching bookings:', error);

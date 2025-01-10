@@ -17,7 +17,6 @@ const AdminDashboard = () => {
       try {
         setLoading(true);
         const data = await getDashboardData();
-        console.log(data, 'Dashboard data fetched');
         setDashboardData(data.data);
       } catch (err) {
         setError('Failed to load dashboard data');

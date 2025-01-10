@@ -18,7 +18,6 @@ export default function Dashboard() {
     const fetchFeaturedHotels = async () => {
       try {
         const response = await api.get('/users/hotels');
-        console.log(response,'ghjg')
         setFeaturedHotels(response.data.data);
       } catch (err) {
         console.error('Error fetching featured hotels:', err);

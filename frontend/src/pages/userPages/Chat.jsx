@@ -20,11 +20,9 @@ const UserChat = () => {
       if (!token || !bookingId) return;
 
       const chatResponse = await api.get(`/users/messages/${bookingId}`);
-      console.log(chatResponse.data, 'chatResponse.data');
       setChat(chatResponse.data || null);
 
       const managerResponse = await api.get(`/users/bookings/${bookingId}/manager`);
-      console.log(managerResponse.data, 'managerResponse.data');
       setManager(managerResponse.data || null);
     } catch (error) {
       console.error('Error fetching chat details:', error);
@@ -43,7 +41,6 @@ const UserChat = () => {
       });
 
       socketRef.current.on('new-message', (message) => {
-        console.log(message, "message ----------------")
         setChat((prevChat) => {
           return {
             ...prevChat,

@@ -27,7 +27,6 @@ const ManagerBookingsPage = () => {
                 }
 
                 const response = await api.get(`/manager/bookings/${managerId}`);
-                console.log(response.data.bookings)
 
                 setBookings(response.data.bookings);
                 setLoading(false);
